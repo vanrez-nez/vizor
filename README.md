@@ -1,2 +1,0 @@
-# vizor
-Created with CodeSandbox
