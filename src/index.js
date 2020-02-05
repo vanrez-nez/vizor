@@ -1,4 +1,3 @@
-import "./styles.css";
 import Renderer from './Renderer';
 import fragmentSource from './glsl/fragment-shader.glsl';
 import vertexSource from './glsl/vertex-shader.glsl';

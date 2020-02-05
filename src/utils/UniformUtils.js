@@ -5,7 +5,7 @@ const ARR = Array;
 const I32 = Int32Array;
 const F32 = Float32Array;
 const UNIFORM_DESCRIPTORS = {
-  // TYPE: [SETTER_SUFFIX, ARRAY_CLASS, COMPONENT_COUNT] 
+  // TYPE: [SETTER_SUFFIX, ARRAY_CLASS, COMPONENT_COUNT]
   [GL.BOOL]: ['1i', ARR, 1],
   [GL.INT]: ['1i', I32, 1],
   [GL.FLOAT]: ['1f', F32, 1],
@@ -22,7 +22,7 @@ const UNIFORM_DESCRIPTORS = {
   [GL.FLOAT_MAT3]: ['Matrix3fv', F32, 9],
   [GL.FLOAT_MAT4]: ['Matrix4fv', F32, 16],
   [GL.SAMPLER_2D]: ['1i', I32, 1],
-  /* 
+  /*
     Missing following uniform types:
     GL.INT_SAMPLER_2D
     GL.INT_SAMPLER_3D
@@ -46,7 +46,7 @@ const UNIFORM_DESCRIPTORS = {
     GL.FLOAT_MAT3x2
     GL.FLOAT_MAT3x4
     GL.FLOAT_MAT4x2
-    GL.FLOAT_MAT4x3    
+    GL.FLOAT_MAT4x3
   */
 };
 
