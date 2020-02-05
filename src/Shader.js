@@ -1,4 +1,4 @@
-import { createProgram, listProgramUniforms,  listProgramAttributes } from './webgl-utils';
+import { createProgram, listProgramUniforms,  listProgramAttributes } from './utils/UniformUtils';
 import Uniform from './Uniform';
 
 let Id = 0;

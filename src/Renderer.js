@@ -1,6 +1,6 @@
 import * as GL from './const/GL';
 import GLState from './GLState';
-import { createContext } from './webgl-utils';
+import { createContext } from './utils/ContextUtils';
 
 
 export default class Renderer {
