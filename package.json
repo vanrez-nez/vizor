@@ -2,15 +2,21 @@
   "name": "vizor",
   "version": "1.0.0",
   "description": "",
-  "main": "index.html",
+  "main": "src/index.js",
   "scripts": {
-    "start": "parcel index.html --open",
-    "build": "parcel build index.html"
+    "start": "parcel demo/test.html --open",
+    "build-dev": "rollup -c --config rollup.dev.js",
+    "build": "rollup -c --config rollup.prod.js"
   },
   "dependencies": {},
   "devDependencies": {
-    "@babel/core": "7.2.0",
-    "parcel-bundler": "^1.6.1"
+    "@babel/core": "^7.8.4",
+    "@babel/preset-env": "^7.8.4",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "parcel-bundler": "^1.6.1",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-glslify": "^1.1.3",
+    "rollup-plugin-terser": "^5.2.0"
   },
   "keywords": []
 }
