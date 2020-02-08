@@ -1,6 +1,10 @@
 import * as GL from '../const/GL';
 import { warn } from './LogUtils';
 
+/*
+  TODO: Support newer WebGL2 uniform types. See: https://mzl.la/2OwicBs
+*/
+
 const ARR = Array;
 const I32 = Int32Array;
 const F32 = Float32Array;
@@ -22,32 +26,6 @@ const UNIFORM_DESCRIPTORS = {
   [GL.FLOAT_MAT3]: ['Matrix3fv', F32, 9],
   [GL.FLOAT_MAT4]: ['Matrix4fv', F32, 16],
   [GL.SAMPLER_2D]: ['1i', I32, 1],
-  /*
-    Missing following uniform types:
-    GL.INT_SAMPLER_2D
-    GL.INT_SAMPLER_3D
-    GL.INT_SAMPLER_CUBE
-    GL.INT_SAMPLER_2D_ARRAY
-    GL.UNSIGNED_INT
-    GL.UNSIGNED_INT_VEC2
-    GL.UNSIGNED_INT_VEC3
-    GL.UNSIGNED_INT_VEC4
-    GL.UNSIGNED_INT_SAMPLER_CUBE
-    GL.UNSIGNED_INT_SAMPLER_2D
-    GL.UNSIGNED_INT_SAMPLER_2D_ARRAY
-    GL.UNSIGNED_INT_SAMPLER_3D
-    GL.SAMPLER_2D_SHADOW
-    GL.SAMPLER_2D_ARRAY_SHADOW
-    GL.SAMPLER_2D_ARRAY
-    GL.SAMPLER_CUBE
-    GL.SAMPLER_CUBE_SHADOW
-    GL.FLOAT_MAT2x3
-    GL.FLOAT_MAT2x4
-    GL.FLOAT_MAT3x2
-    GL.FLOAT_MAT3x4
-    GL.FLOAT_MAT4x2
-    GL.FLOAT_MAT4x3
-  */
 };
 
 function getDescriptor(type) {
@@ -56,19 +34,40 @@ function getDescriptor(type) {
   return desc;
 }
 
-function getUniformName(type, size) {
+function getSetterName(type, size) {
   let [suffix] = getDescriptor(type);
   if (size > 1) {
-    /* transform 1i/1f suffixes to 1iv/1fv if uniform is an array*/
+    // transform 1i/1f suffixes to 1iv/1fv if uniform is an array
     suffix = suffix.replace(/v?$/, 'v');
   }
   return `uniform${suffix}`;
 }
 
+function parseUniformName(name) {
+  const parts = name.match(/(\w+)/g);
+  const isStruct = name.indexOf('.') > -1;
+  const isStructArray = isStruct && !isNaN(parts[1]);
+  const isPropArray = !isNaN(parts[parts.length - 1]);
+  return {
+    isStruct,
+    isStructArray,
+    isPropArray,
+    // Extract uniform parts (order matters)
+    property: {
+      index: isPropArray ? Number(parts.pop()) : -1,
+      name: parts.pop(),
+    },
+    struct: {
+      index: isStructArray ? Number(parts.pop()) : -1,
+      name: parts.pop(),
+    }
+  };
+}
+
 const UniformSetters = {}
 export function getUniformSetter(gl, type, size) {
   if (!UniformSetters[type]) {
-    const glName = getUniformName(type, size);
+    const glName = getSetterName(type, size);
     const glFunction = gl[glName];
     const isMatrix = /Matrix/.test(glName);
     UniformSetters[type] = function setUniform(location, value) {
@@ -100,7 +99,8 @@ export function listProgramUniforms(gl, program) {
   for (let i = 0; i < count; i++) {
     const { name, type, size } = gl.getActiveUniform(program, i);
     const location = gl.getUniformLocation(program, name);
-    uniforms.push({ name, type, size, location });
+    const parts = parseUniformName(name);
+    uniforms.push({ parts, name, type, size, location });
   }
   return uniforms;
 }

@@ -1,3 +1,3 @@
-export function warn(message) {
-  console.log(message);
+export function warn(message, description) {
+  console.log(message, description);
 }
