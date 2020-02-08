@@ -4,9 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "parcel demo/test.html --open",
-    "build-dev": "rollup -c --config rollup.dev.js",
-    "build": "rollup -c --config rollup.prod.js"
+    "start": "parcel examples/test.html --open --out-dir dist/local",
+    "build-dev": "rollup --config --configDev",
+    "build": "rollup -c"
   },
   "dependencies": {},
   "devDependencies": {

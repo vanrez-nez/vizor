@@ -13,13 +13,13 @@ export default {
     resolve(),
     babel(),
     glslify(),
-    // terser({
-    //   output: {
-    //     beautify: 'preamble',
-    //     comments: 'all',
-    //   },
-    //   compress: false,
-    //   keep_fnames: true,
-    // }),
+    terser({
+      output: {
+        beautify: 'preamble',
+        comments: 'all',
+      },
+      compress: false,
+      keep_fnames: true,
+    }),
   ]
 };
