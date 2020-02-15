@@ -2,7 +2,6 @@ import * as GL from '../const/GL';
 import GLState from './GLState';
 import { createContext } from '../utils/ContextUtils';
 
-
 export default class Renderer {
   constructor(id) {
     this.gl = createContext({
@@ -10,18 +9,18 @@ export default class Renderer {
       version: 1,
       options: {},
     });
-    this.state = new GLState();
+    this.state = new GLState(this.gl);
     this.dpr = 1; // Device Pixel Ratio
   }
 
   resize(width, height, updateStyle = false) {
-    const { dpr, gl } = this;
+    const { dpr, gl, state } = this;
     const { canvas } = gl;
     const [w, h] = [width * dpr, height * dpr];
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
-      gl.viewport(0, 0, w, h);
+      state.setViewport(0, 0, width, height);
       if (updateStyle) {
         Object.assign(canvas.style, {
           width: `${w}px`,
