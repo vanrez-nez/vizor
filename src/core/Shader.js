@@ -5,7 +5,6 @@ import UniformArray from './UniformArray';
 /*
   TODO: Support for uniforms as arrays of arrays (GLSL ES 3.10)
   TODO: Support for uniform blocks
-  TODO: Support for struct parsing
 */
 
 let Id = 0;
@@ -21,14 +20,14 @@ export default class Shader {
     this.program = createProgram(gl, vertexSource, fragmentSource);
     this.uniforms = this.createUniforms();
     this.attributes = this.createAttributes();
+    console.log(this.uniforms);
+    console.log(this.attributes);
   }
 
   createUniforms() {
     const { gl, program } = this;
     const uniforms = {};
-    const list = listProgramUniforms(gl, program);
-    console.log(list);
-    list.forEach(info => {
+    listProgramUniforms(gl, program, (info) => {
       const {
         isStructArray,
         isPropArray,
@@ -74,15 +73,19 @@ export default class Shader {
 
   createAttributes() {
     const { gl, program } = this;
-    const list = listProgramAttributes(gl, program);
+    const attributes = {};
+    listProgramAttributes(gl, program, (info) => {
+      attributes[info.name] = info;
+    });
+    return attributes;
   }
 
   use(state) {
-    const { gl, program, id } = this;
-    const active = state.programId === id;
-    if (!active) {
-      gl.useProgram(program);
-      state.programId = id;
+    const { program, uniforms } = this;
+    state.useProgram(program);
+    for (const name in this.uniforms) {
+      uniforms[name].update();
     }
+
   }
 }

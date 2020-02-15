@@ -93,23 +93,22 @@ export function getUniformDefaultValue(type, size) {
   return value;
 }
 
-export function listProgramUniforms(gl, program) {
-  const uniforms = [];
+export function listProgramUniforms(gl, program, callback) {
   let count = gl.getProgramParameter(program, GL.ACTIVE_UNIFORMS);
   for (let i = 0; i < count; i++) {
     const { name, type, size } = gl.getActiveUniform(program, i);
     const location = gl.getUniformLocation(program, name);
     const parts = parseUniformName(name);
-    uniforms.push({ parts, name, type, size, location });
+    callback({ parts, name, type, size, location });
   }
-  return uniforms;
 }
 
-export function listProgramAttributes(gl, program) {
+export function listProgramAttributes(gl, program, callback) {
   let count = gl.getProgramParameter(program, GL.ACTIVE_ATTRIBUTES);
   for (let i = 0; i < count; i++) {
-    let attribute = gl.getActiveAttrib(program, i);
-    console.log(attribute);
+    const { name, type, size } = gl.getActiveAttrib(program, i);
+    const location = gl.getAttribLocation(program, name);
+    callback({ name, type, size, location });
   }
 }
 
@@ -120,7 +119,6 @@ export function compileShader(gl, type, source) {
   const success = gl.getShaderParameter(shader, GL.COMPILE_STATUS);
   if (!success) {
     const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
     warn('Shader compilation error: ', error);
   }
   return shader;
@@ -137,9 +135,9 @@ export function createProgram(gl, vertexSource, fragmentSource) {
   if (!linked) {
     const error = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
-    gl.deleteShader(vertex);
-    gl.deleteShader(fragment);
     warn('Program link error:', error);
   }
+  gl.deleteShader(vertex);
+  gl.deleteShader(fragment);
   return program;
 }
