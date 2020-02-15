@@ -1,5 +1,5 @@
 import { getUniformSetter, getUniformDefaultValue } from '../utils/UniformUtils.js';
-import { arraysEqual, copyArray } from '../utils/ArrayUtils';
+import { arraysEqual, copyArray, isArray } from '../utils/ArrayUtils';
 
 /*
   TODO: Optimize uniform setters by allowing to set by component.
@@ -16,41 +16,33 @@ export default class Uniform {
     this.size = size;
     this.parts = parts;
     this.setter = getUniformSetter(gl, type, size);
-    this.cache = getUniformDefaultValue(type, size);
+    this.current = getUniformDefaultValue(type, size);
+    this.isArray = isArray(this.current);
+    this.needsUpdate = true;
   }
 
-  setCache(value) {
-    if (value.length) {
-      copyArray(value, this.cache);
-    } else {
-      this.cache = value;
+  equals(a, b) {
+    const { isArray } = this;
+    return  a === b || isArray && arraysEqual(a, b);
+  }
+
+  update() {
+    const { location, current } = this;
+    if (this.needsUpdate) {
+      this.setter(location, current);
+      this.needsUpdate = false;
     }
-  }
-
-  equals(value) {
-    const { cache } = this;
-    if (value.length) {
-      return arraysEqual(value, cache);
-    }
-    return value === cache;
-  }
-
-  updateArray(program, value, index) {
-    const { gl, name } = this;
-    let newName = name.replace(/\[\d+\]$/, `[${index}]`);
-    const loc = gl.getUniformLocation(program, newName);
-    gl.uniform2fv(loc, value);
   }
 
   set value(value) {
-    const { location } = this;
-    if (!this.equals(value)) {
-      this.setter(location, value);
-      this.setCache(value);
+    const { isArray } = this;
+    if (this.needsUpdate || this.equals(value, this.current)) {
+      this.current = isArray ? copyArray(value, this.current) : value;
+      this.needsUpdate = true;
     }
   }
 
   get value() {
-    return this.cache;
+    return this.current;
   }
 }
