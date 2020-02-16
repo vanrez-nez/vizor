@@ -99,7 +99,7 @@ export function listProgramUniforms(gl, program, callback) {
     const { name, type, size } = gl.getActiveUniform(program, i);
     const location = gl.getUniformLocation(program, name);
     const parts = parseUniformName(name);
-    callback({ parts, name, type, size, location });
+    callback({ program, parts, name, type, size, location });
   }
 }
 
@@ -108,7 +108,7 @@ export function listProgramAttributes(gl, program, callback) {
   for (let i = 0; i < count; i++) {
     const { name, type, size } = gl.getActiveAttrib(program, i);
     const location = gl.getAttribLocation(program, name);
-    callback({ name, type, size, location });
+    callback({ program, name, type, size, location });
   }
 }
 

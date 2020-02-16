@@ -54,16 +54,10 @@ export default class Shader {
       }
 
       if (isPropArray) {
-        // should be an array uniform object
-        root[property.name] = new UniformArray();
+        root[property.name] = new UniformArray(gl, info);
         root = root[property.name];
-        for (let i = 0; i < info.size; i++) {
-          // should be an offsetted uniform
-          const obj =  new Uniform(gl, info);
-          root[i] = obj;
-        }
       } else {
-        const obj =  new Uniform(gl, info);
+        const obj = new Uniform(gl, info);
         root[property.name] = obj;
       }
 
@@ -83,9 +77,8 @@ export default class Shader {
   use(state) {
     const { program, uniforms } = this;
     state.useProgram(program);
-    for (const name in this.uniforms) {
+    for (const name in uniforms) {
       uniforms[name].update();
     }
-
   }
 }
