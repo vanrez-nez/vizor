@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "parcel examples/test.html --open --out-dir dist/local",
+    "start": "parcel examples/*.html --open --out-dir dist/local",
     "build-dev": "rollup --config --configDev",
     "build": "rollup -c"
   },

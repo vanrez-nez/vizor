@@ -3,7 +3,10 @@
     [
       "@babel/env", {
         "modules": false,
-        "loose": true
+        "loose": true,
+        "targets": {
+          "browsers": ["last 2 Chrome versions"]
+        }
       }
     ]
   ]
