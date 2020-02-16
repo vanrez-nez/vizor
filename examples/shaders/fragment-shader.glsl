@@ -1,7 +1,12 @@
 precision highp float;
 
+uniform vec3 u_vec3a[3];
 varying vec2 vUv;
 
 void main() {
-  gl_FragColor = vec4(vec3(vUv, 1.0), 1.0);
+  vec3 c = vec3(0.0);
+  c.r += u_vec3a[0].r;
+  c.g += u_vec3a[1].g;
+  c.b += u_vec3a[2].b;
+  gl_FragColor = vec4(c, 1.0);
 }
