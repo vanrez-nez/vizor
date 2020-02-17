@@ -66,11 +66,12 @@ function parseUniformName(name) {
 
 const UniformSetters = {}
 export function getUniformSetter(gl, type, size) {
-  if (!UniformSetters[type]) {
+  const key = `${type}_${size}`;
+  if (!UniformSetters[key]) {
     const glName = getSetterName(type, size);
     const glFunction = gl[glName];
     const isMatrix = /Matrix/.test(glName);
-    UniformSetters[type] = function setUniform(location, value) {
+    UniformSetters[key] = function setUniform(location, value) {
       if (isMatrix) {
         glFunction.call(gl, location, false, value);
       } else {
@@ -78,7 +79,7 @@ export function getUniformSetter(gl, type, size) {
       }
     };
   }
-  return UniformSetters[type];
+  return UniformSetters[key];
 }
 
 export function getUniformDefaultValue(type, size) {
