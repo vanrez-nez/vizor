@@ -1,5 +1,5 @@
 import * as GL from '../const/GL';
-import { warn } from './LogUtils';
+import { warn, printShaderError } from './LogUtils';
 
 /*
   TODO: Support newer WebGL2 uniform types. See: https://mzl.la/2OwicBs
@@ -120,7 +120,7 @@ export function compileShader(gl, type, source) {
   const success = gl.getShaderParameter(shader, GL.COMPILE_STATUS);
   if (!success) {
     const error = gl.getShaderInfoLog(shader);
-    warn('Shader compilation error: ', error);
+    printShaderError(error, source);
   }
   return shader;
 }
@@ -137,6 +137,7 @@ export function createProgram(gl, vertexSource, fragmentSource) {
     const error = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
     warn('Program link error:', error);
+    return;
   }
   gl.deleteShader(vertex);
   gl.deleteShader(fragment);
