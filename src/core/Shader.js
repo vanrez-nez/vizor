@@ -4,7 +4,9 @@ import UniformArray from './UniformArray';
 
 /*
   TODO: Support for uniforms as arrays of arrays (GLSL ES 3.10)
+  TODO: Support for custom defines and recompiling without loosing state
   TODO: Support for uniform blocks
+  TODO: Release shader
 */
 
 let Id = 0;
@@ -18,10 +20,12 @@ export default class Shader {
     this.gl = gl;
     this.id = Id++;
     this.program = createProgram(gl, vertexSource, fragmentSource);
-    this.uniforms = this.createUniforms();
-    this.attributes = this.createAttributes();
-    console.log(this.uniforms);
-    console.log(this.attributes);
+    if (this.program) {
+      this.uniforms = this.createUniforms();
+      this.attributes = this.createAttributes();
+      console.log(this.uniforms);
+      console.log(this.attributes);
+    }
   }
 
   createUniforms() {
