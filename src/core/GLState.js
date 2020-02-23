@@ -6,6 +6,8 @@ export default class GLState {
     this.program = -1;
     this.viewport = { x: 0, y: 0, w: 0, h: 0 };
     this.activeBuffer = -1;
+    this.activeTextureUnit = -1;
+    this.textureUnits = [];
   }
 
   useProgram(program) {
@@ -43,4 +45,30 @@ export default class GLState {
       gl.bufferData(target, data, usage);
     }
   }
+
+  releaseTexture(texture) {
+    const { textureUnits, gl } = this;
+    // what if texture is binded or active?
+    gl.deleteTexture(texture.texture);
+  }
+
+  // Sets an active texture unit
+  activeTexture(unit) {
+    const { activeTextureUnit, gl } = this;
+    if (activeTextureUnit !== unit) {
+      gl.activeTexture(GL.TEXTURE0 + unit);
+      this.activeTextureUnit = unit;
+    }
+  }
+
+  // Binds a texture on active unit
+  bindTexture(texture) {
+    const { activeTextureUnit, textureUnits, gl } = this;
+    if (textureUnits[activeTextureUnit] !== texture.id) {
+      gl.bindTexture(texture.target, texture.texture);
+      textureUnits[activeTextureUnit] = texture.id;
+    }
+  }
+
+
 }
