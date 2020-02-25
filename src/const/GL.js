@@ -626,188 +626,188 @@ export const MAX_CUBE_MAP_TEXTURE_SIZE = 0x851C;
 /**
  * A texture unit.
  */
-export const GL_TEXTURE0 = 0x84c0;
-export const GL_TEXTURE1 = 0x84c1;
+export const TEXTURE0 = 0x84c0;
+export const TEXTURE1 = 0x84c1;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE2 = 0x84c2;
+export const TEXTURE2 = 0x84c2;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE3 = 0x84c3;
+export const TEXTURE3 = 0x84c3;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE4 = 0x84c4;
+export const TEXTURE4 = 0x84c4;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE5 = 0x84c5;
+export const TEXTURE5 = 0x84c5;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE6 = 0x84c6;
+export const TEXTURE6 = 0x84c6;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE7 = 0x84c7;
+export const TEXTURE7 = 0x84c7;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE8 = 0x84c8;
+export const TEXTURE8 = 0x84c8;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE9 = 0x84c9;
+export const TEXTURE9 = 0x84c9;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE10 = 0x84ca;
+export const TEXTURE10 = 0x84ca;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE11 = 0x84cb;
+export const TEXTURE11 = 0x84cb;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE12 = 0x84cc;
+export const TEXTURE12 = 0x84cc;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE13 = 0x84cd;
+export const TEXTURE13 = 0x84cd;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE14 = 0x84ce;
+export const TEXTURE14 = 0x84ce;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE15 = 0x84cf;
+export const TEXTURE15 = 0x84cf;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE16 = 0x84d0;
+export const TEXTURE16 = 0x84d0;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE17 = 0x84d1;
+export const TEXTURE17 = 0x84d1;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE18 = 0x84d2;
+export const TEXTURE18 = 0x84d2;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE19 = 0x84d3;
+export const TEXTURE19 = 0x84d3;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE20 = 0x84d4;
+export const TEXTURE20 = 0x84d4;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE21 = 0x84d5;
+export const TEXTURE21 = 0x84d5;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE22 = 0x84d6;
+export const TEXTURE22 = 0x84d6;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE23 = 0x84d7;
+export const TEXTURE23 = 0x84d7;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE24 = 0x84d8;
+export const TEXTURE24 = 0x84d8;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE25 = 0x84d9;
+export const TEXTURE25 = 0x84d9;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE26 = 0x84da;
+export const TEXTURE26 = 0x84da;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE27 = 0x84db;
+export const TEXTURE27 = 0x84db;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE28 = 0x84dc;
+export const TEXTURE28 = 0x84dc;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE29 = 0x84dd;
+export const TEXTURE29 = 0x84dd;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE30 = 0x84de;
+export const TEXTURE30 = 0x84de;
 
 /**
  * A texture unit.
  * @constant {number}
  */
-export const GL_TEXTURE31 = 0x84df;
+export const TEXTURE31 = 0x84df;
 
 
 /**
