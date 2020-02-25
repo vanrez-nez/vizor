@@ -26,8 +26,9 @@ export default class VertexBufferAttribute {
     this.glBuffer = -1;
   }
 
-  update(state) {
+  update() {
     const { target, glBuffer, data, usage } = this;
+    const { state } = this.gl;
     if (this.needsUpdate) {
       state.bindBuffer(target, glBuffer);
       state.bufferData(target, data, usage);
@@ -36,9 +37,9 @@ export default class VertexBufferAttribute {
     }
   }
 
-  bind(state, { location }) {
+  bind(location) {
     const { gl,target, size, glBuffer, stride, offset, normalized } = this;
-    state.bindBuffer(target, glBuffer);
+    gl.state.bindBuffer(target, glBuffer);
     gl.vertexAttribPointer(location, size, GL.FLOAT, normalized, stride, offset);
     gl.enableVertexAttribArray(location);
   }

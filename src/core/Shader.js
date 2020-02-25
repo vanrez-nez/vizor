@@ -21,6 +21,7 @@ export default class Shader {
     this.id = Id++;
     this.program = createProgram(gl, vertexSource, fragmentSource);
     if (this.program) {
+      this.samplers = [];
       this.uniforms = this.createUniforms();
       this.attributes = this.createAttributes();
       console.log(this.uniforms);
@@ -29,7 +30,7 @@ export default class Shader {
   }
 
   createUniforms() {
-    const { gl, program } = this;
+    const { gl, program, samplers } = this;
     const uniforms = {};
     listProgramUniforms(gl, program, (info) => {
       const {
@@ -62,6 +63,10 @@ export default class Shader {
         root = root[property.name];
       } else {
         const obj = new Uniform(gl, info);
+        if (obj.isSampler) {
+          obj.textureUnit = samplers.length;
+          samplers.push(obj);
+        }
         root[property.name] = obj;
       }
 
@@ -78,9 +83,9 @@ export default class Shader {
     return attributes;
   }
 
-  use(state) {
-    const { program, uniforms } = this;
-    state.useProgram(program);
+  use() {
+    const { program, uniforms, gl } = this;
+    gl.state.useProgram(program);
     for (const name in uniforms) {
       uniforms[name].update();
     }
