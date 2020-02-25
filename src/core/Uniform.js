@@ -26,7 +26,9 @@ export default class Uniform {
     this.setter = getUniformSetter(gl, type, size);
     this.current = getUniformDefaultValue(type, size);
     this.isArray = isArray(this.current);
+    this.isSampler = type === GL.SAMPLER_2D;
     this.needsUpdate = true;
+    this.textureUnit = -1;
   }
 
   equals(a, b) {
