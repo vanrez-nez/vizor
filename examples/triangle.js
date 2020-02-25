@@ -1,5 +1,5 @@
-import vertexSource from './shaders/vertex-shader.glsl';
-import fragmentSource from './shaders/fragment-shader.glsl';
+import vertexSource from './shaders/triangle-vert.glsl';
+import fragmentSource from './shaders/triangle-frag.glsl';
 import { DrawCall, Renderer, Shader, Geometry } from '../src/index';
 
 class Test {
