@@ -1,13 +1,13 @@
-import Uniform from './Uniform';
+import RawUniform from './RawUniform';
 // TODO: Allow to update the uniform array at once (and keep in sync children)
 
-export default class UniformArray extends Array {
+export default class RawUniformArray extends Array {
   constructor(gl, info) {
     super();
     this.context = {
       gl,
       info,
-      globalUniform: new Uniform(gl, info)
+      globalUniform: new RawUniform(gl, info)
     };
     this.splitUniform();
   }
@@ -18,7 +18,7 @@ export default class UniformArray extends Array {
     for (let i = 0; i < size; i++) {
       const name = parts.property.name + `[${i}]`;
       const location = gl.getUniformLocation(program, name);
-      const obj = new Uniform(gl, {
+      const obj = new RawUniform(gl, {
         ...info,
         location,
         size: 1,

@@ -1,7 +1,8 @@
-import { createProgram, listProgramUniforms,  listProgramAttributes } from '../utils/UniformUtils';
+import RawUniform from './RawUniform';
+import RawUniformArray from './RawUniformArray';
 import Uniform from './Uniform';
-import UniformArray from './UniformArray';
-
+import { createProgram, listProgramUniforms,  listProgramAttributes } from '../utils/UniformUtils';
+import { warn } from '../utils/LogUtils';
 /*
   TODO: Support for uniforms as arrays of arrays (GLSL ES 3.10)
   TODO: Support for custom defines and recompiling without loosing state
@@ -10,7 +11,6 @@ import UniformArray from './UniformArray';
 */
 
 let Id = 0;
-
 export default class Shader {
   constructor(gl, {
     vertexSource,
@@ -21,17 +21,29 @@ export default class Shader {
     this.id = Id++;
     this.program = createProgram(gl, vertexSource, fragmentSource);
     if (this.program) {
-      this.samplers = [];
-      this.uniforms = this.createUniforms();
-      this.attributes = this.createAttributes();
+      const rawUniforms = Shader.GetRawUniforms(gl, this.program);
+      this.uniforms = Shader.CreateUniforms(rawUniforms, uniforms);
+      this.attributes = Shader.GetAttributes(gl, this.program);
       console.log(this.uniforms);
       console.log(this.attributes);
     }
   }
 
-  createUniforms() {
-    const { gl, program, samplers } = this;
+  static CreateUniforms(rawUniforms, values) {
     const uniforms = {};
+    for (let name in rawUniforms) {
+      if (name in rawUniforms) {
+        uniforms[name] = new Uniform(rawUniforms[name], values[name]);
+      } else {
+        const validNames = Object.keys(rawUniforms).join(',');
+        warn(`Invalid uniform name: ${name}. Must be any of: [${validNames}]`);
+      }
+    }
+    return uniforms;
+  }
+
+  static GetRawUniforms(gl, program) {
+    const result = {};
     listProgramUniforms(gl, program, (info) => {
       const {
         isStructArray,
@@ -42,7 +54,7 @@ export default class Shader {
       } = info.parts;
 
       // top level object
-      let root = uniforms;
+      let root = result;
 
       if (isStruct) {
 
@@ -59,23 +71,18 @@ export default class Shader {
       }
 
       if (isPropArray) {
-        root[property.name] = new UniformArray(gl, info);
+        root[property.name] = new RawUniformArray(gl, info);
         root = root[property.name];
       } else {
-        const obj = new Uniform(gl, info);
-        if (obj.isSampler) {
-          obj.textureUnit = samplers.length;
-          samplers.push(obj);
-        }
+        const obj = new RawUniform(gl, info);
         root[property.name] = obj;
       }
 
     });
-    return uniforms;
+    return result;
   }
 
-  createAttributes() {
-    const { gl, program } = this;
+  static GetAttributes(gl, program) {
     const attributes = {};
     listProgramAttributes(gl, program, (info) => {
       attributes[info.name] = info;
@@ -86,8 +93,14 @@ export default class Shader {
   use() {
     const { program, uniforms, gl } = this;
     gl.state.useProgram(program);
+    let textureUnit = 0;
     for (const name in uniforms) {
-      uniforms[name].update();
+      const uniform = uniforms[name];
+      if (uniform.isTexture) {
+        uniform.textureUnit = textureUnit; // textureManager.allocate(uniform.value);
+        textureUnit++;
+      }
+      uniform.update();
     }
   }
 }
