@@ -14,7 +14,7 @@ export default class Renderer {
     gl.state = new GLState(gl);
     gl.capabilities = new GLCapabilities(gl);
     this.gl = gl;
-    this.dpr = 2;
+    this.dpr = 1;
   }
 
   resize(width, height, updateStyle = false) {
@@ -24,11 +24,11 @@ export default class Renderer {
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
-      gl.state.setViewport(0, 0, width, height);
+      gl.state.setViewport(0, 0, w, h);
       if (updateStyle) {
         Object.assign(canvas.style, {
-          width: `${w}px`,
-          height: `${h}px`
+          width: `${width}px`,
+          height: `${height}px`
         });
       }
     }
@@ -36,7 +36,7 @@ export default class Renderer {
 
   clear() {
     const { gl } = this;
-    gl.clearColor(0, 0, 0, 1);
+    gl.state.setClearColor(0, 1, 0, 1);
     // Needs to clear with other flags via selection
     gl.clear(GL.COLOR_BUFFER_BIT);
   }
