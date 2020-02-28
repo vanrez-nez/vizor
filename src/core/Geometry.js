@@ -1,6 +1,6 @@
 import * as GL from '../const/GL';
 import { TypedArrToGLType } from '../utils/ArrayUtils';
-import VertexBufferAttribute from './VertexBufferAttribute';
+import VertexBuffer from './VertexBuffer';
 
 export default class Geometry {
   constructor(gl) {
@@ -14,7 +14,7 @@ export default class Geometry {
   setAttribute(name, { data, size, normalized, stride, offset }) {
     const { drawRange, bufferAttributes, gl } = this;
     if (!bufferAttributes[name]) {
-      const buff = new VertexBufferAttribute(gl, {
+      const buff = new VertexBuffer(gl, {
         type: TypedArrToGLType(data),
         usage: GL.STATIC_DRAW,
         size,
