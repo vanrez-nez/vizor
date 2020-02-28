@@ -3,18 +3,39 @@ import GLState from './GLState';
 import GLCapabilities from './GLCapabilities';
 import { createContext } from '../utils/ContextUtils';
 
-export default class Renderer {
-  constructor(id) {
-    const gl = createContext({
-      canvas: document.getElementById(id),
-      version: 1,
-      options: {},
-    });
+// TODO: Define Shader Precision Format gl.getShaderPrecisionFormat
 
-    gl.state = new GLState(gl);
-    gl.capabilities = new GLCapabilities(gl);
-    this.gl = gl;
+const DEFAULT_OPTIONS = {
+  antialias: false,
+  stencil: true,
+  depth: true,
+  alpha: false,
+  powerPreference: 'default',
+  premultipliedAlpha: true,
+};
+
+export default class Renderer {
+  constructor({
+    canvas,
+    contextType = 'webgl',
+    options = DEFAULT_OPTIONS,
+  }) {
+    this.canvas = canvas;
+    this.options = options;
+    this.contextType = contextType;
     this.dpr = 1;
+    this.initContext();
+  }
+
+  initContext() {
+    const { canvas, contextType } = this;
+    const options = { ...DEFAULT_OPTIONS, ...this.options };
+    const gl = createContext({ canvas, contextType, options });
+    this.state = new GLState(gl);
+    this.capabilities = new GLCapabilities(gl);
+    gl.state = this.state;
+    gl.capabilities = this.capabilities;
+    this.gl = gl;
   }
 
   resize(width, height, updateStyle = false) {
