@@ -33,7 +33,7 @@ export default class Shader {
     const uniforms = {};
     for (let name in rawUniforms) {
       if (name in rawUniforms) {
-        uniforms[name] = new Uniform(rawUniforms[name], values[name]);
+        uniforms[name] = new Uniform(rawUniforms[name], values, name);
       } else {
         const validNames = Object.keys(rawUniforms).join(',');
         warn(`Invalid uniform name: ${name}. Must be any of: [${validNames}]`);

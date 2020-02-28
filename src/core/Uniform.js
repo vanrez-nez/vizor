@@ -1,7 +1,8 @@
 export default class Uniform {
-  constructor(rawUniform, value) {
+  constructor(rawUniform, values, key) {
     this.raw = rawUniform;
-    this.value = value;
+    this.values = values;
+    this.key = key;
     this.textureUnit = -1;
   }
 
@@ -16,6 +17,14 @@ export default class Uniform {
       }
     }
     raw.update();
+  }
+
+  get value() {
+    return this.values[this.key];
+  }
+
+  set value(val) {
+    this.values[this.key] = val;
   }
 
   get isTexture() {
