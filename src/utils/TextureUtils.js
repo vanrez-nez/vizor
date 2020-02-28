@@ -15,9 +15,19 @@ export function resizeImage(image, size) {
   // TextureToPowerOfTwo
 }
 
-export function setTextureParameters(gl, texture) {
-  gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, texture.wrapS);
-  gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, texture.wrapT);
-  gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, texture.magFilter);
-  gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, texture.minFilter);
+export function setTextureParameters(gl, { target, wrapS, wrapT, magFilter, minFilter }) {
+  gl.texParameteri(target, GL.TEXTURE_WRAP_S, wrapS);
+  gl.texParameteri(target, GL.TEXTURE_WRAP_T, wrapT);
+  gl.texParameteri(target, GL.TEXTURE_MIN_FILTER, minFilter);
+  gl.texParameteri(target, GL.TEXTURE_MAG_FILTER, magFilter);
+}
+
+export function setPixelStore(gl, texture) {
+  gl.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
+}
+
+
+export function generateMipmaps(gl, texture) {
+  // generate mips only if power of two
+  //gl.generateMipmap(texture.target);
 }
