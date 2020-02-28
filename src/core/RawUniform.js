@@ -45,7 +45,7 @@ export default class RawUniform {
 
   set value(value) {
     const { isArray } = this;
-    if (this.needsUpdate || this.equals(value, this.current)) {
+    if (this.needsUpdate || !this.equals(value, this.current)) {
       this.current = isArray ? copyArray(value, this.current) : value;
       this.needsUpdate = true;
     }
