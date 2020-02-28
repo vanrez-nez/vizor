@@ -1,6 +1,7 @@
 import RawUniform from './RawUniform';
 import RawUniformArray from './RawUniformArray';
 import Uniform from './Uniform';
+import Attribute from './Attribute';
 import { createProgram, listProgramUniforms,  listProgramAttributes } from '../utils/UniformUtils';
 import { warn } from '../utils/LogUtils';
 /*
@@ -85,7 +86,7 @@ export default class Shader {
   static GetAttributes(gl, program) {
     const attributes = {};
     listProgramAttributes(gl, program, (info) => {
-      attributes[info.name] = info;
+      attributes[info.name] = new Attribute(gl, info);
     });
     return attributes;
   }

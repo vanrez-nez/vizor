@@ -14,9 +14,10 @@ export default class DrawCall {
     for (const name in shader.attributes) {
       const attr = shader.attributes[name];
       const buff = geometry.bufferAttributes[name];
+      buff.bindAttribute(attr);
       if (buff) {
         buff.update();
-        buff.bind(attr.location);
+        buff.bind();
       }
     }
     gl.drawArrays(GL.TRIANGLES, first, count);

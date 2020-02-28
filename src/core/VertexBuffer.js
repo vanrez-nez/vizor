@@ -1,6 +1,6 @@
 import * as GL from '../const/GL';
 
-export default class VertexBufferAttribute {
+export default class VertexBuffer {
   constructor(gl, {
     usage,
     size,
@@ -18,6 +18,7 @@ export default class VertexBufferAttribute {
     this.glBuffer = gl.createBuffer();
     this.data = null;
     this.needsUpdate = false;
+    this.initialized = false;
   }
 
   remove() {
@@ -37,11 +38,17 @@ export default class VertexBufferAttribute {
     }
   }
 
-  bind(location) {
-    const { gl,target, size, glBuffer, stride, offset, normalized } = this;
+  bind() {
+    const { gl, target, glBuffer } = this;
     gl.state.bindBuffer(target, glBuffer);
-    gl.vertexAttribPointer(location, size, GL.FLOAT, normalized, stride, offset);
-    gl.enableVertexAttribArray(location);
+  }
+
+  bindAttribute(attr) {
+    if (!this.initialized) {
+      this.initialized = true;
+      this.bind();
+      attr.bind(this);
+    }
   }
 
   setData(data) {
