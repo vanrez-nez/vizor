@@ -1,10 +1,32 @@
 import * as GL from '../const/GL';
 
+class PropertySet {
+  constructor(obj) {
+    this.keys = Object.keys(obj);
+    this.lenght = this.keys.length;
+    this.set(obj);
+  }
+
+  set(obj) {
+    const { keys, lenght } = this;
+    let modified = false;
+    for (let i = 0; i < lenght; i++) {
+      const key = keys[i];
+      if (this[key] !== obj[key]) {
+        this[key] = obj[key];
+        modified = true;
+      }
+    }
+    return modified;
+  }
+}
+
 export default class GLState {
   constructor(gl) {
     this.gl = gl;
     this.program = -1;
-    this.viewport = { x: 0, y: 0, w: 0, h: 0 };
+    this.clearColor = new PropertySet({ r: 0, g: 0, b: 0, a: 0 });
+    this.viewport = new PropertySet({ x: 0, y: 0, w: 0, h: 0 });
     this.activeBuffer = -1;
     this.activeTextureUnit = -1;
     this.textureUnits = [];
@@ -19,13 +41,16 @@ export default class GLState {
   }
 
   setViewport(x, y, w, h) {
-    const { gl, viewport: v } = this;
-    if ( x != v.x || y != v.y || v.w != w || v.h != h) {
-      v.x = x;
-      v.y = y;
-      v.w = w;
-      v.h = h;
+    const { gl, viewport } = this;
+    if (viewport.set({ x, y, w, h })) {
       gl.viewport(x, y, w, h);
+    }
+  }
+
+  setClearColor(r, g, b, a) {
+    const { gl, clearColor } = this;
+    if (clearColor.set({ r, g, b, a })) {
+      gl.clearColor(r, g, b, a);
     }
   }
 
@@ -69,6 +94,5 @@ export default class GLState {
       textureUnits[activeTextureUnit] = texture.id;
     }
   }
-
 
 }
