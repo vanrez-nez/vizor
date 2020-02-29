@@ -1,6 +1,7 @@
 import * as GL from '../const/GL';
 import GLState from './GLState';
 import GLCapabilities from './GLCapabilities';
+import EventEmitter from './EventEmitter';
 import { createContext } from '../utils/ContextUtils';
 
 // TODO: Define Shader Precision Format gl.getShaderPrecisionFormat
@@ -18,18 +19,24 @@ export default class Renderer {
   constructor({
     canvas,
     contextType = 'webgl',
+    contextHandler = null,
     options = DEFAULT_OPTIONS,
   }) {
+    this.events = new EventEmitter();
     this.canvas = canvas;
     this.options = options;
     this.contextType = contextType;
+    this.contextHandler = contextHandler;
     this.dpr = 1;
     this.initContext();
   }
 
   initContext() {
-    const { canvas, contextType } = this;
+    const { canvas, contextType, contextHandler } = this;
     const options = { ...DEFAULT_OPTIONS, ...this.options };
+    if (contextHandler) {
+      contextHandler.bind(this);
+    }
     const gl = createContext({ canvas, contextType, options });
     this.state = new GLState(gl);
     this.capabilities = new GLCapabilities(gl);
@@ -63,7 +70,12 @@ export default class Renderer {
   }
 
   render(scene, camera) {
-    const { gl } = this;
+    const { gl, contextLost } = this;
+    if (contextLost) return;
+  }
 
+  get contextLost() {
+    const { contextHandler: handler } = this;
+    return handler && handler.contextLost || false;
   }
 }
