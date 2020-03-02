@@ -47,6 +47,7 @@ function getMaxAnisotropy(gl, extensions) {
     return ext ? gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT) : 0;
 }
 
+const Instances = new WeakMap();
 export default class GLCapabilities {
   constructor(gl) {
     this.webgl2 = gl instanceof WebGL2RenderingContext;
@@ -55,5 +56,12 @@ export default class GLCapabilities {
     limits.maxAnisotropy = getMaxAnisotropy(gl, extensions);
     this.extensions = extensions;
     this.limits = limits;
+  }
+
+  static Get(gl) {
+    if (!Instances.has(gl)) {
+      Instances.set(gl, new GLCapabilities(gl));
+    }
+    return Instances.get(gl);
   }
 }

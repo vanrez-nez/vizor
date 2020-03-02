@@ -21,6 +21,7 @@ class PropertySet {
   }
 }
 
+const Instances = new WeakMap();
 export default class GLState {
   constructor(gl) {
     this.gl = gl;
@@ -30,6 +31,13 @@ export default class GLState {
     this.activeBuffer = -1;
     this.activeTextureUnit = -1;
     this.textureUnits = [];
+  }
+
+  static Get(gl) {
+    if (!Instances.has(gl)) {
+      Instances.set(gl, new GLState(gl));
+    }
+    return Instances.get(gl);
   }
 
   useProgram(program) {
