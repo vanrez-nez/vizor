@@ -15,8 +15,6 @@ const renderer = new Renderer({
   },
 });
 
-console.log(renderer);
-
 const drawCall = new DrawCall(renderer);
 const { gl } = renderer;
 
