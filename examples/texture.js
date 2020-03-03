@@ -1,29 +1,22 @@
 import vertexSource from './shaders/texture-vert.glsl';
 import fragmentSource from './shaders/texture-frag.glsl';
-import imageURL from './images/bg_512x512.jpg';
-import { DrawCall, Renderer, Shader, Geometry, Texture2D, ContextHandler } from '../src/index';
+import imageURL from './images/bg.png';
+import { DrawCall, Renderer, Shader, Geometry, Texture2D, Addons, TextureResize, ContextHandler } from '../src/index';
 
-const contextHandler = new ContextHandler();
+Addons.Register(TextureResize);
+Addons.Register(ContextHandler);
+
 const renderer = new Renderer({
   canvas: document.getElementById('js-canvas'),
-  // contextType: 'webgl2',
-  contextHandler,
+  contextType: 'webgl',
   options: {
     antialias: true,
-  }
+    alpha: true,
+  },
 });
-
-renderer.events.on('webglcontextrestored', () => {
-  console.log('glRestored');
-});
-
-renderer.events.on('webglcontextlost', () => {
-  console.log('glLost');
-});
-
-contextHandler.forceContextLoss();
 
 console.log(renderer);
+
 const drawCall = new DrawCall(renderer);
 const { gl } = renderer;
 
