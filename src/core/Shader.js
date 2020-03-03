@@ -2,6 +2,7 @@ import RawUniform from './RawUniform';
 import RawUniformArray from './RawUniformArray';
 import Uniform from './Uniform';
 import Attribute from './Attribute';
+import GLState from './GLState';
 import { createProgram, listProgramUniforms,  listProgramAttributes } from '../utils/UniformUtils';
 import { warn } from '../utils/LogUtils';
 /*
@@ -18,8 +19,9 @@ export default class Shader {
     fragmentSource,
     uniforms = {},
   }) {
-    this.gl = gl;
     this.id = Id++;
+    this.gl = gl;
+    this.state = GLState.Get(gl);
     this.program = createProgram(gl, vertexSource, fragmentSource);
     if (this.program) {
       const rawUniforms = Shader.GetRawUniforms(gl, this.program);
@@ -92,8 +94,8 @@ export default class Shader {
   }
 
   use() {
-    const { program, uniforms, gl } = this;
-    gl.state.useProgram(program);
+    const { program, uniforms, state } = this;
+    state.useProgram(program);
     let textureUnit = 0;
     for (const name in uniforms) {
       const uniform = uniforms[name];
