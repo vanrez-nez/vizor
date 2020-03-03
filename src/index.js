@@ -3,7 +3,6 @@ export { default as Object3D } from './core/Object3D';
 export { default as Geometry } from './core/Geometry';
 export { default as Renderer } from './core/Renderer';
 export { default as DrawCall } from './core/DrawCall';
-export { default as ContextHandler } from './core/ContextHandler';
 export { default as Texture2D } from './core/Texture2D';
 export { default as Shader } from './core/Shader';
 export { default as Mesh } from './core/Mesh';
@@ -11,3 +10,7 @@ export { default as Vec4 } from './math/Vec4';
 export { default as Vec3 } from './math/Vec3';
 export { default as Vec2 } from './math/Vec2';
 export { default as ImageLoader } from './loaders/ImageLoader';
+
+export { default as Addons } from './core/Addons';
+export { default as TextureResize } from './addons/TextureResize';
+export { default as ContextHandler } from './addons/ContextHandler';
