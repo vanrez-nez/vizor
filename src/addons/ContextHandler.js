@@ -8,6 +8,11 @@ const GL_RESTORE_EVENT = 'webglcontextrestored';
 */
 
 export default class ContextHandler {
+
+  static GetKey() {
+    return 'ContextHandler';
+  }
+
   constructor() {
     this.renderer = null;
     this.contextLost = false;
