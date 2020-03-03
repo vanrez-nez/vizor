@@ -3,6 +3,7 @@ import GLState from './GLState';
 import GLCapabilities from './GLCapabilities';
 import EventEmitter from './EventEmitter';
 import { createContext } from '../utils/ContextUtils';
+import Addons from './Addons';
 
 // TODO: Define Shader Precision Format gl.getShaderPrecisionFormat
 
@@ -19,14 +20,13 @@ export default class Renderer {
   constructor({
     canvas,
     contextType = 'webgl',
-    contextHandler = null,
     options = DEFAULT_OPTIONS,
   }) {
     this.events = new EventEmitter();
     this.canvas = canvas;
     this.options = options;
     this.contextType = contextType;
-    this.contextHandler = contextHandler;
+    this.contextHandler = Addons.Get('ContextHandler');
     this.dpr = 1;
     this.initContext();
   }
@@ -38,21 +38,19 @@ export default class Renderer {
       contextHandler.bind(this);
     }
     const gl = createContext({ canvas, contextType, options });
-    this.state = new GLState(gl);
-    this.capabilities = new GLCapabilities(gl);
-    gl.state = this.state;
-    gl.capabilities = this.capabilities;
+    this.capabilities = GLCapabilities.Get(gl);
+    this.state = GLState.Get(gl);
     this.gl = gl;
   }
 
   resize(width, height, updateStyle = false) {
-    const { dpr, gl } = this;
+    const { dpr, gl, state } = this;
     const { canvas } = gl;
     const [w, h] = [width * dpr, height * dpr];
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
-      gl.state.setViewport(0, 0, w, h);
+      state.setViewport(0, 0, w, h);
       if (updateStyle) {
         Object.assign(canvas.style, {
           width: `${width}px`,
@@ -63,8 +61,8 @@ export default class Renderer {
   }
 
   clear() {
-    const { gl } = this;
-    gl.state.setClearColor(0, 1, 0, 1);
+    const { gl, state } = this;
+    state.setClearColor(0, 1, 0, 1);
     // Needs to clear with other flags via selection
     gl.clear(GL.COLOR_BUFFER_BIT);
   }
