@@ -50,7 +50,7 @@ function getMaxAnisotropy(gl, extensions) {
 const Instances = new WeakMap();
 export default class GLCapabilities {
   constructor(gl) {
-    this.webgl2 = gl instanceof WebGL2RenderingContext;
+    this.webgl2 = WebGL2RenderingContext != undefined && gl instanceof WebGL2RenderingContext;
     const extensions = getExtensions(gl);
     const limits = getLimits(gl);
     limits.maxAnisotropy = getMaxAnisotropy(gl, extensions);
