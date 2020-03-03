@@ -1,4 +1,5 @@
 import * as GL from '../const/GL';
+import GLState from './GLState';
 
 export default class VertexBuffer {
   constructor(gl, {
@@ -9,6 +10,7 @@ export default class VertexBuffer {
     offset = 0,
   }) {
     this.gl = gl;
+    this.state = GLState.Get(gl);
     this.usage = usage;
     this.size = size;
     this.normalized = normalized;
@@ -28,8 +30,7 @@ export default class VertexBuffer {
   }
 
   update() {
-    const { target, glBuffer, data, usage } = this;
-    const { state } = this.gl;
+    const { target, glBuffer, data, usage, state } = this;
     if (this.needsUpdate) {
       state.bindBuffer(target, glBuffer);
       state.bufferData(target, data, usage);
@@ -39,8 +40,8 @@ export default class VertexBuffer {
   }
 
   bind() {
-    const { gl, target, glBuffer } = this;
-    gl.state.bindBuffer(target, glBuffer);
+    const { state, target, glBuffer } = this;
+    state.bindBuffer(target, glBuffer);
   }
 
   bindAttribute(attr) {
