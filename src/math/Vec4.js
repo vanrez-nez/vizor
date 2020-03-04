@@ -11,6 +11,46 @@ export default class Vec4 {
     return this;
   }
 
+  add(v) {
+    this.x += v.x;
+    this.y += v.y;
+    this.z += v.z;
+    this.w += v.w;
+    return this;
+  }
+
+  sub(v) {
+    this.x -= v.x;
+    this.y -= v.y;
+    this.z -= v.z;
+    this.w -= v.w;
+    return this;
+  }
+
+  multiply(v) {
+    this.x *= v.x;
+    this.y *= v.y;
+    this.z *= v.z;
+    this.w *= v.w;
+    return this;
+  }
+
+  divide(v) {
+    this.x /= v.x;
+    this.y /= v.y;
+    this.z /= v.z;
+    this.w /= v.w;
+    return this;
+  }
+
+  addScalar(v) {}
+
+  subScalar(v) {}
+
+  multiplyScalar(scalar) {}
+
+  divideScalar(scalar) {}
+
   copy(v) {
     return this.set(v.x, v.y, v.z, v.w);
   }
