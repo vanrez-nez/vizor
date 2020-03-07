@@ -151,8 +151,10 @@ export default class Vec2 {
   }
 
   rotateAround(center, angle) {
-    const [c, s] = [Math.cos(angle), Math.sin(angle)];
-    const [x, y] = [this.x - center.x, this.y - center.y];
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    const x = this.x - center.x;
+    const y = this.y - center.y;
     this.x = x * c - y * s + center.x;
     this.y = x * s + y * c + center.y;
     return this;
