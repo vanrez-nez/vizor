@@ -174,9 +174,11 @@ export default class Vec3 {
     return this;
   }
 
-  cross(v) {
-    const { x: ax, y: ay, z: az } = this;
-    const { x: bx, y: by, z: bz } = v;
+  cross(v1, v2) {
+    const a = v2 ? v1 : this;
+    const b = v2 ? v2 : v1;
+    const { x: ax, y: ay, z: az } = a;
+    const { x: bx, y: by, z: bz } = b;
     this.x = ay * bz - az * by;
     this.y = az * bx - ax * bz;
     this.z = ax * by - ay * bx;
