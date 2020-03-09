@@ -6,8 +6,8 @@ export default class Vec4 {
     this.w = w || 0;
   }
 
-  add(v) {
-    return VecFun.add(this, v, 4);
+  add(v1, v2) {
+    return VecFun.add(this, v1 || this, v2, 4);
   }
 
   addScalar(scalar) {
@@ -46,8 +46,9 @@ export default class Vec4 {
     return VecFun.distanceSquared(this, v, 4);
   }
 
-  div(v) {
-    return VecFun.div(this, v, 4);
+  div(v1, v2) {
+    if (v2) return VecFun.div(this, v1, v2, 4);
+    return VecFun.div(this, this, v1, 4);
   }
 
   divScalar(scalar) {
@@ -94,8 +95,8 @@ export default class Vec4 {
     return VecFun.min(this, v, 4);
   }
 
-  multiply(v) {
-    return VecFun.mul(this, v, 4);
+  multiply(v1, v2) {
+    return VecFun.mul(this, v1 || this, v2, 4);
   }
 
   multiplyScalar(scalar) {
@@ -122,15 +123,17 @@ export default class Vec4 {
     return VecFun.setLength(this, length, 4);
   }
 
-  sub(v) {
-    return VecFun.sub(this, v, 4);
+  sub(v1, v2) {
+    if (v2) return VecFun.div(this, v1, v2, 4);
+    return VecFun.sub(this, this, v1, 4);
   }
 
   subScalar(scalar) {
     return VecFun.subScalar(this, scalar, 4);
   }
 
-
+  // setAxisAngleFromQuaternion(quat) {}
+  // setAxisAngleFromRotationMatrix(mat) {}
 
   applyMatrix4(m) {
     const { x, y, z, w } = this;

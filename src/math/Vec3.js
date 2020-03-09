@@ -7,8 +7,8 @@ export default class Vec3 {
     this.z = z || z;
   }
 
-  add(v) {
-    return VecFun.add(this, v, 3);
+  add(v1, v2) {
+    return VecFun.add(this, v2 || this, v1, 3);
   }
 
   addScalar(scalar) {
@@ -47,8 +47,9 @@ export default class Vec3 {
     return VecFun.distanceSquared(this, v, 3);
   }
 
-  div(v) {
-    return VecFun.div(this, v, 3);
+  div(v1, v2) {
+    if (v2) return VecFun.div(this, v1, v2, 3);
+    return VecFun.div(this, this, v1, 3);
   }
 
   divScalar(scalar) {
@@ -95,8 +96,8 @@ export default class Vec3 {
     return VecFun.min(this, v, 3);
   }
 
-  multiply(v) {
-    return VecFun.mul(this, v, 3);
+  multiply(v1, v2) {
+    return VecFun.mul(this, v2 || this, v1, 3);
   }
 
   multiplyScalar(scalar) {
@@ -123,8 +124,9 @@ export default class Vec3 {
     return VecFun.setLength(this, length, 3);
   }
 
-  sub(v) {
-    return VecFun.sub(this, v, 3);
+  sub(v1, v2) {
+    if (v2) return VecFun.sub(this, v1, v2, 3);
+    return VecFun.sub(this, this, v1, 3);
   }
 
   subScalar(scalar) {

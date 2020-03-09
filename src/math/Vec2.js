@@ -6,8 +6,8 @@ export default class Vec2 {
     this.y = y || 0;
   }
 
-  add(v) {
-    return VecFun.add(this, v, 2);
+  add(v1, v2) {
+    return VecFun.add(this, v2 || this, v1, 2);
   }
 
   addScalar(scalar) {
@@ -94,8 +94,8 @@ export default class Vec2 {
     return VecFun.min(this, v, 2);
   }
 
-  multiply(v) {
-    return VecFun.mul(this, v, 2);
+  multiply(v1, v2) {
+    return VecFun.mul(this, v2 || this, v1, 2);
   }
 
   multiplyScalar(scalar) {
@@ -122,8 +122,9 @@ export default class Vec2 {
     return VecFun.setLength(this, length, 2);
   }
 
-  sub(v) {
-    return VecFun.sub(this, v, 2);
+  sub(v1, v2) {
+    if (v2) return VecFun.sub(this, v1, v2, 2);
+    return VecFun.sub(this, this, v1, 2);
   }
 
   subScalar(scalar) {

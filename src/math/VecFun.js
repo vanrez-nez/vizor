@@ -8,11 +8,11 @@ const {
   sqrt: Sqrt
 } = Math;
 
-export function add(out, vec, len) {
-  out.x += vec.x;
-  out.y += vec.y;
-  if (len > 2) { out.z += vec.z;
-    if (len > 3) out.w += vec.w;
+export function add(out, a, b, len) {
+  out.x = a.x + b.x;
+  out.y = a.y + b.y;
+  if (len > 2) { out.z = a.z + b.z;
+    if (len > 3) out.w = a.w + b.w;
   }
   return out;
 }
@@ -88,11 +88,11 @@ export function distanceSquared(out, vec, len) {
   return result;
 }
 
-export function div(out, vec, len) {
-  out.x /= vec.x;
-  out.y /= vec.y;
-  if (len > 2) { out.z /= vec.z;
-    if (len > 3) out.w /= vec.w;
+export function div(out, a, b, len) {
+  out.x = a.x / b.x;
+  out.y = a.y / b.y;
+  if (len > 2) { out.z = a.z / b.z;
+    if (len > 3) out.w = a.w / b.w;
   }
   return out;
 }
@@ -173,11 +173,11 @@ export function min(out, vec, len) {
   return out;
 }
 
-export function mul(out, vec, len) {
-  out.x *= vec.x;
-  out.y *= vec.y;
-  if (len > 2) { out.z *= vec.z;
-    if (len > 3) out.w *= vec.w;
+export function mul(out, a, b, len) {
+  out.x = a.x * b.x;
+  out.y = a.y * b.y;
+  if (len > 2) { out.z = a.z * b.z;
+    if (len > 3) out.w = a.w * b.w;
   }
   return out;
 }
@@ -236,11 +236,11 @@ export function setLength(out, length, len) {
   return mulScalar(out, length, len);
 }
 
-export function sub(out, vec, len) {
-  out.x -= vec.x;
-  out.y -= vec.y;
-  if (len > 2) { out.z -= vec.z;
-    if (len > 3) out.w -= vec.w;
+export function sub(out, a, b, len) {
+  out.x = a.x - b.x;
+  out.y = a.y - b.y;
+  if (len > 2) { out.z = a.z - b.z;
+    if (len > 3) out.w = a.w - b.w;
   }
   return out;
 }
