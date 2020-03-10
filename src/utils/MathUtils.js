@@ -1,5 +1,9 @@
 // https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
 
+export function clamp(val, min, max) {
+  return Math.min(Math.max(val, min), max);
+}
+
 export function isPowerOfTwo(x) {
   return (x & (x - 1)) == 0;
 }
