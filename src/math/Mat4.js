@@ -1,7 +1,15 @@
 import { warn } from "../utils/LogUtils";
 import Vec3 from './Vec3';
 
-const { cos: Cos, sin: Sin } = Math;
+const { cos: Cos, sin: Sin, hypot: Hypot } = Math;
+const CACHE = {
+  M4_0: new Mat4(),
+  V3_0: new Vec3(),
+  V3_1: new Vec3(),
+  V3_2: new Vec3(),
+  V3_ZERO: new Vec3(0, 0, 0),
+  V3_ONE: new Vec3(1, 1, 1)
+};
 
 const Identity = Object.freeze([
   1, 0, 0, 0,
@@ -62,11 +70,12 @@ export default class Mat4 extends Array {
     return this;
   }
 
-  static MultiplyScalar(out, scalar) {
-    out[0] *= scalar; out[4] *= scalar; out[8] *= scalar; out[12] *= scalar;
-		out[1] *= scalar; out[5] *= scalar; out[9] *= scalar; out[13] *= scalar;
-		out[2] *= scalar; out[6] *= scalar; out[10] *= scalar; out[14] *= scalar;
-    out[3] *= scalar; out[7] *= scalar; out[11] *= scalar; out[15] *= scalar;
+  multiplyScalar(scalar) {
+    const { e } = this;
+    e[0] *= scalar; e[4] *= scalar; e[8] *= scalar; e[12] *= scalar;
+		e[1] *= scalar; e[5] *= scalar; e[9] *= scalar; e[13] *= scalar;
+		e[2] *= scalar; e[6] *= scalar; e[10] *= scalar; e[14] *= scalar;
+    e[3] *= scalar; e[7] *= scalar; e[11] *= scalar; e[15] *= scalar;
     return this;
   }
 
@@ -120,6 +129,7 @@ export default class Mat4 extends Array {
     return this;
   }
 
+  // same as fromRotationTranslationScale in gl-matrix
   compose(position, quaternion, scale) {
     const e = this;
     const { x: sx, y: sy, z: sz } = scale;
@@ -152,17 +162,11 @@ export default class Mat4 extends Array {
     return this;
   }
 
-  decompose(position, quaternion, scale) {
-    const e = this;
-    const sx = _v1.set
-
-  }
-
   clone() {
     return new Mat4(this);
   }
 
-  copyPosition(m) {
+  copyTranslation(m) {
     const e = this;
     e[12] = m[12];
     e[13] = m[13];
@@ -170,7 +174,45 @@ export default class Mat4 extends Array {
     return this;
   }
 
-  setPosition(x, y, z) {
+  decompose(position, quaternion, scale) {
+    const { M4_0 } = CACHE;
+    const [
+      m00, m10, m20,,
+      m01, m11, m21,,
+      m02, m12, m22,,
+      m03, m13, m23,
+    ] = this;
+
+    const sx = Hypot(m00, m10, m20);
+    const sy = Hypot(m01, m11, m21);
+    const sz = Hypot(m02, m12, m22);
+
+    if (this.determinant() < 0) sx = -sx;
+
+    M4_0.copy(this);
+
+    const invSX = 1 / sx;
+    const invSY = 1 / sy;
+    const invSZ = 1 / sz;
+
+    M4_0[0] *= invSX;
+    M4_0[2] *= invSX;
+    M4_0[3] *= invSX;
+
+    M4_0[4] *= invSY;
+    M4_0[5] *= invSY;
+    M4_0[6] *= invSY;
+
+    M4_0[7] *= invSZ;
+    M4_0[8] *= invSZ;
+    M4_0[9] *= invSZ;
+
+    quaternion.setFromRotationMatrix(M4_0);
+    position.set(m03, m13, m23);
+    scale.set(sx, sy, sz);
+  }
+
+  setTranslation(x, y, z) {
     const e = this;
     e[12] = x;
     e[13] = y;
@@ -204,7 +246,7 @@ export default class Mat4 extends Array {
     );
   }
 
-  getInverse(m) {
+  invert(m) {
     const [
       m00, m10, m20, m30,
       m01, m11, m21, m31,
@@ -266,7 +308,7 @@ export default class Mat4 extends Array {
     return this;
   }
 
-  makeRotationX(rad) {
+  fromRotationX(rad) {
     const s = Sin(rad);
     const c = Cos(rad);
     return this.set(
@@ -277,7 +319,7 @@ export default class Mat4 extends Array {
     );
   }
 
-  makeRotationY(rad) {
+  fromRotationY(rad) {
     const s = Sin(rad);
     const c = Cos(rad);
     return this.set(
@@ -288,7 +330,7 @@ export default class Mat4 extends Array {
     );
   }
 
-  makeRotationZ(rad) {
+  fromRotationZ(rad) {
     const s = Sin(rad);
     const c = Cos(rad);
     return this.set(
@@ -299,28 +341,49 @@ export default class Mat4 extends Array {
     );
   }
 
-  ortho() {}
-  perspective() {}
-  translate() {}
-  fromQuaternion(q) {}
-  fromRotation(rad, axis) {}
+  makeOrthographic(left, right, top, bottom, near, far) {
+    const e = this.copy(Identity);
+    const lr = 1 / (right - left);
+    const bt = 1 / (top - bottom);
+    const nf = 1 / (far - near);
+    e[0] = -2 * lr;
+    e[5] = -2 * bt;
+    e[10] = -2 * nf;
+    e[12] = -(left + right) * lr;
+    e[13] = -(top + bottom) * br;
+    e[14] = -(far + near) * nf;
+  }
 
+  makePerspective(left, right, top, bottom, near, far) {
+    const e = this.copy(Identity);
+    e[0] = 2 * near / (right - left);
+    e[5] = 2 * near / (top - bottom);
+    e[8] = (right + left) / (right - left);
+    e[9] = (top + bottom) / (top - bottom);
+    e[10] = -(far + near) / (far - near);
+    e[11] = -1;
+    e[14] = -2 * far * near / (far - near);
+    return this;
+  }
 
-  // fromScaling in gl-matrix
-  makeScale(x, y, z) {
+  fromQuatRotation(q) {
+    const { V3_ONE, V3_ZERO } = CACHE;
+    return this.compose(V3_ZERO, q, V3_ONE);
+  }
+
+  fromScale(x, y, z) {
     this.copy(Identity);
     this.setScale(x, y, z);
     return this;
   }
 
-  // fromTranslation in gl-matrix
-  makeTranslation(x, y, z) {
+  fromTranslation(x, y, z) {
     this.copy(Identity);
-    this.setPosition(x, y, z);
+    this.setTranslation(x, y, z);
     return this;
   }
 
-  makeRotation(axis, rad) {
+  fromRotation(axis, rad) {
     const { x, y, z } = axis;
     const c = Cos(rad);
     const s = Sin(rad);
@@ -340,5 +403,29 @@ export default class Mat4 extends Array {
     return Mat4.Multiply(this, this, m);
   }
 
-  lookAt(eye, target, up) {}
+  premultiply(m) {
+    return Mat4.Multiply(m, this);
+  }
+
+  lookAt(eye, target, up) {
+    const e = this;
+    const { V3_0: vx, V3_1: vy, V3_2: vz } = CACHE;
+    vz.sub(eye, target);
+    if (vz.lengthSqrt() === 0) vz.z = 1;
+    vz.normalize();
+    vx.cross(up, vz);
+    if (vx.lengthSqrt() === 0) {
+      vz.x += Number.EPSILON;
+      vx.z += Number.EPSILON;
+      vz.normalize();
+      vx.cross(up, vz);
+    }
+    vx.normalize();
+    vy.cross(vz, vx);
+    e[0] = vx.x; e[4] = vy.x; e[8] = vz.x;
+    e[1] = vx.y; e[5] = vy.y; e[9] = vz.y;
+    e[2] = vx.z; e[6] = vy.z; e[10] = vz.z;
+    return this;
+  }
+
 }
