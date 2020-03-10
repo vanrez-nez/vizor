@@ -1,5 +1,6 @@
 import { warn } from "../utils/LogUtils";
 import Vec3 from './Vec3';
+import { copy, multiplyScalar, equals } from "./MatFunc";
 
 const { cos: Cos, sin: Sin, hypot: Hypot } = Math;
 const CACHE = {
@@ -32,7 +33,6 @@ export default class Mat4 extends Array {
   }
 
   static Multiply(out, a, b) {
-
     const [
       a00, a10, a20, a30,
       a01, a11, a21, a31,
@@ -71,33 +71,11 @@ export default class Mat4 extends Array {
   }
 
   multiplyScalar(scalar) {
-    const { e } = this;
-    e[0] *= scalar; e[4] *= scalar; e[8] *= scalar; e[12] *= scalar;
-		e[1] *= scalar; e[5] *= scalar; e[9] *= scalar; e[13] *= scalar;
-		e[2] *= scalar; e[6] *= scalar; e[10] *= scalar; e[14] *= scalar;
-    e[3] *= scalar; e[7] *= scalar; e[11] *= scalar; e[15] *= scalar;
-    return this;
+    multiplyScalar(this, scalar, 16);
   }
 
   copy(m) {
-    const e = this;
-    e[0] = m[0];
-    e[1] = m[1];
-    e[2] = m[2];
-    e[3] = m[3];
-    e[4] = m[4];
-    e[5] = m[5];
-    e[6] = m[6];
-    e[7] = m[7];
-    e[8] = m[8];
-    e[9] = m[9];
-    e[10] = m[10];
-    e[11] = m[11];
-    e[12] = m[12];
-    e[13] = m[13];
-    e[14] = m[14];
-    e[15] = m[15];
-    return this;
+    return copy(this, m, 16);
   }
 
   identity() {
@@ -109,23 +87,23 @@ export default class Mat4 extends Array {
   }
 
   set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
-    const e = this;
-		e[0] = m00; e[4] = m01; e[8] = m02; e[12] = m03;
-		e[1] = m10; e[5] = m11; e[9] = m12; e[13] = m13;
-		e[2] = m20; e[6] = m21; e[10] = m22; e[14] = m23;
-		e[3] = m30; e[7] = m31; e[11] = m32; e[15] = m33;
+    const m = this;
+		m[0] = m00; m[4] = m01; m[8] = m02; m[12] = m03;
+		m[1] = m10; m[5] = m11; m[9] = m12; m[13] = m13;
+		m[2] = m20; m[6] = m21; m[10] = m22; m[14] = m23;
+		m[3] = m30; m[7] = m31; m[11] = m32; m[15] = m33;
     return this;
   }
 
   transpose() {
-    const e = this;
+    const m = this;
     let swap;
-    swap = e[1]; e[1] = e[4]; e[4] = swap;
-    swap = e[2]; e[2] = e[8]; e[8] = swap;
-    swap = e[6]; e[6] = e[9]; e[9] = swap;
-    swap = e[3]; e[3] = e[12]; e[12] = swap;
-    swap = e[7]; e[7] = e[13]; e[13] = swap;
-    swap = e[11]; e[11] = e[14]; e[14] = swap;
+    swap = m[1]; m[1] = m[4]; m[4] = swap;
+    swap = m[2]; m[2] = m[8]; m[8] = swap;
+    swap = m[6]; m[6] = m[9]; m[9] = swap;
+    swap = m[3]; m[3] = m[12]; m[12] = swap;
+    swap = m[7]; m[7] = m[13]; m[13] = swap;
+    swap = m[11]; m[11] = m[14]; m[14] = swap;
     return this;
   }
 
@@ -180,7 +158,7 @@ export default class Mat4 extends Array {
       m00, m10, m20,,
       m01, m11, m21,,
       m02, m12, m22,,
-      m03, m13, m23,
+      m03, m13, m23,,
     ] = this;
 
     const sx = Hypot(m00, m10, m20);
@@ -213,18 +191,18 @@ export default class Mat4 extends Array {
   }
 
   setTranslation(x, y, z) {
-    const e = this;
-    e[12] = x;
-    e[13] = y;
-    e[14] = z;
+    const m = this;
+    m[12] = x;
+    m[13] = y;
+    m[14] = z;
     return this;
   }
 
   setScale(x, y, z) {
-    const e = this;
-    e[1] = x;
-    e[5] = y;
-    e[10] = z;
+    const m = this;
+    m[1] = x;
+    m[5] = y;
+    m[10] = z;
     return this;
   }
 
@@ -299,11 +277,11 @@ export default class Mat4 extends Array {
 
   scale(v) {
     const { x, y, z } = v;
-    const e = this;
-    e[0] *= x; e[4] *= y; e[8] *= z;
-    e[1] *= x; e[5] *= y; e[9] *= z;
-    e[2] *= x; e[6] *= y; e[10] *= z;
-    e[3] *= x; e[7] *= y; e[11] *= z;
+    const m = this;
+    m[0] *= x; m[4] *= y; m[8] *= z;
+    m[1] *= x; m[5] *= y; m[9] *= z;
+    m[2] *= x; m[6] *= y; m[10] *= z;
+    m[3] *= x; m[7] *= y; m[11] *= z;
 
     return this;
   }
@@ -403,12 +381,8 @@ export default class Mat4 extends Array {
     return Mat4.Multiply(this, this, m);
   }
 
-  premultiply(m) {
-    return Mat4.Multiply(m, this);
-  }
-
   lookAt(eye, target, up) {
-    const e = this;
+    const m = this;
     const { V3_0: vx, V3_1: vy, V3_2: vz } = CACHE;
     vz.sub(eye, target);
     if (vz.lengthSqrt() === 0) vz.z = 1;
@@ -422,10 +396,20 @@ export default class Mat4 extends Array {
     }
     vx.normalize();
     vy.cross(vz, vx);
-    e[0] = vx.x; e[4] = vy.x; e[8] = vz.x;
-    e[1] = vx.y; e[5] = vy.y; e[9] = vz.y;
-    e[2] = vx.z; e[6] = vy.z; e[10] = vz.z;
+    m[0] = vx.x; m[4] = vy.x; m[8] = vz.x;
+    m[1] = vx.y; m[5] = vy.y; m[9] = vz.y;
+    m[2] = vx.z; m[6] = vy.z; m[10] = vz.z;
     return this;
+  }
+
+  // extractBasis
+  // makeBasis
+  // extractRotation
+  // fromMatrixRotation
+  // fromEulerRotation
+
+  equals(m) {
+    return equals(this, m, 16);
   }
 
 }
