@@ -1,4 +1,5 @@
 export default function JSBenchmark({
+  id = 'benchmark',
   setup = () => {},
   tests = [],
 }) {
@@ -38,11 +39,10 @@ export default function JSBenchmark({
     bench.add(name, { fn, setup, onComplete, onStart, onError });
   });
 
-  return {
-    run: function() {
-      setTimeout(function() {
-        bench.run();
-      }, 100);
-    }
-  }
+
+  document.addEventListener(id, () => {
+    setTimeout(function() {
+      bench.run();
+    }, 100);
+  })
 }

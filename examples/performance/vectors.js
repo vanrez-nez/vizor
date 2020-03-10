@@ -1,6 +1,7 @@
 import JSBenchmark from './benchmark';
 
-window.bench = new JSBenchmark({
+JSBenchmark({
+  id: 'vectors',
   setup: function() {
     var total = 0;
     function add(out, v, len) {

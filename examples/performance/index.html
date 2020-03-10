@@ -10,9 +10,17 @@
 </head>
 <body>
   <div>
-    <div>Vectors Benchmark</div>
-    <button onclick="bench.run()">Start</button>
+    <div>Performance Benchmarks</div>
+    <script>
+    function startBenchmark(id) {
+      var event = new Event(id);
+      document.dispatchEvent(event);
+    }
+    </script>
+    <button onclick="startBenchmark('vectors')">Start Vectors Test</button>
+    <button onclick="startBenchmark('matrix')">Start Matrix Test</button>
   </div>
   <script src="./vectors.js"></script>
+  <script src="./matrix.js"></script>
 </body>
 </html>
