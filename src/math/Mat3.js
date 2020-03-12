@@ -13,36 +13,9 @@ const Zero = Object.freeze([
 ]);
 
 export default class Mat3 extends Array {
-  constructor(arr = Identity) {
+  constructor() {
     super(9);
-    this.copy(arr);
-  }
-
-  static Multiply(out, m1, m2) {
-    const [
-      a00, a10, a20,
-      a01, a11, a21,
-      a02, a12, a22,
-    ] = m1;
-
-    const [
-      b00, b10, b20,
-      b01, b11, b21,
-      b02, b12, b22,
-    ] = m2;
-
-    out[0] = a00 * b00 + a01 * b10 + a02 * b20;
-    out[3] = a00 * b01 + a01 * b11 + a02 * b21;
-    out[6] = a00 * b02 + a01 * b12 + a02 * b22;
-
-		out[1] = a10 * b00 + a11 * b10 + a12 * b20;
-		out[4] = a10 * b01 + a11 * b11 + a12 * b21;
-		out[7] = a10 * b02 + a11 * b12 + a12 * b22;
-
-    out[2] = a20 * b00 + a21 * b10 + a22 * b20;
-		out[5] = a20 * b01 + a21 * b11 + a22 * b21;
-    out[8] = a20 * b02 + a21 * b12 + a22 * b22;
-    return out;
+    this.copy(Identity);
   }
 
   set(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
@@ -66,7 +39,7 @@ export default class Mat3 extends Array {
   }
 
   clone() {
-    return new Mat3(this);
+    return new Mat3().clone(this);
   }
 
   fromMatrix4(m) {
@@ -77,8 +50,32 @@ export default class Mat3 extends Array {
     );
   }
 
-  multiply(m) {
-    return Mat3.Multiply(this, this, m);
+  multiply(m1, m2) {
+    const m = this;
+    const [
+      a00, a10, a20,
+      a01, a11, a21,
+      a02, a12, a22,
+    ] = m2 ? m1 : this;
+
+    const [
+      b00, b10, b20,
+      b01, b11, b21,
+      b02, b12, b22,
+    ] = m2 ? m2 : m1;
+
+    m[0] = a00 * b00 + a01 * b10 + a02 * b20;
+    m[3] = a00 * b01 + a01 * b11 + a02 * b21;
+    m[6] = a00 * b02 + a01 * b12 + a02 * b22;
+
+		m[1] = a10 * b00 + a11 * b10 + a12 * b20;
+		m[4] = a10 * b01 + a11 * b11 + a12 * b21;
+		m[7] = a10 * b02 + a11 * b12 + a12 * b22;
+
+    m[2] = a20 * b00 + a21 * b10 + a22 * b20;
+		m[5] = a20 * b01 + a21 * b11 + a22 * b21;
+    m[8] = a20 * b02 + a21 * b12 + a22 * b22;
+    return this;
   }
 
   multiplyScalar(scalar) {
