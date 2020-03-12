@@ -20,7 +20,7 @@ export function copy(out, mat, len) {
   return out;
 }
 
-export function multiplyScalar(out, scalar) {
+export function multiplyScalar(out, scalar, len) {
   out[0] *= scalar;
   out[1] *= scalar;
   out[2] *= scalar;
