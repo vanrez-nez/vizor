@@ -1,5 +1,6 @@
 import * as VecFunc from "./VecFun";
-const { cos: Cos, sin: Sin, sqrt: Sqrt } = Math;
+import { clamp } from '../utils/MathUtils';
+const { atan2: Atan2, abs: Abs, acos: Acos, cos: Cos, sin: Sin, sqrt: Sqrt } = Math;
 const Noop = () => {};
 
 export default class Quat {
@@ -9,17 +10,6 @@ export default class Quat {
     this._z = z || 0;
     this._w = w !== undefined ? w : 1;
     this.onChange = Noop;
-  }
-
-  static Multiply(out, a, b) {
-    const { _x: ax, _y: ay, _z: az, _w: aw } = a;
-    const { _x: bx, _y: by, _z: bz, _w: bw } = b;
-
-		out._x = ax * bw + aw * bx + ay * bz - az * by;
-		out._y = ay * bw + aw * by + az * bx - ax * bz;
-		out._z = az * bw + aw * bz + ax * by - ay * bx;
-    out._w = aw * bw - ax * bx - ay * by - az * bz;
-    return out;
   }
 
   get x() {
@@ -58,37 +48,62 @@ export default class Quat {
     this.onChange();
   }
 
-  slerp(from, to, step) {
-    const { _x: ax, _y: ay, _z: az, _w: aw } = from;
-    const { _x: ax, _y: ay, _z: az, _w: aw } = to;
-    let omega, cosom, sinom, scale0, scale1;
-    // calc cosine
-    cosom = ax * bx + ay * by + az * bz + aw * bw;
-    // adjust signs (if necessary)
-    if (cosom < 0.0) {
-        cosom = -cosom;
-        bx = -bx;
-        by = -by;
-        bz = -bz;
-        bw = -bw;
-    }
-    // calculate coefficients
-    if ((1.0 - cosom) > 0.000001) {
-        omega = Math.acos(cosom);
-        sinom = Math.sin(omega);
-        scale0 = Math.sin((1.0 - step) * omega) / sinom;
-        scale1 = Math.sin(t * omega) / sinom;
-    } else {n
-        scale0 = 1.0 - step;
-        scale1 = step;
-    }
-    // calculate final values
-    this._x = scale0 * ax + scale1 * bx;
-    this._y = scale0 * ay + scale1 * by;
-    this._z = scale0 * az + scale1 * bz;
-    this._w = scale0 * aw + scale1 * bw;
+  angleTo(q) {
+    return 2 * Acos( Abs( clamp( this.dot( q ), - 1, 1 ) ) );
+  }
 
-    return out;
+  slerpTo(to, t) {
+    return this.slerp(this, to, t);
+  }
+
+  slerp(from, to, t) {
+    if (t === 0) return this.copy(from);
+    if (t === 1) return this.copy(to);
+
+    const { _x: x, _y: y, _z: z, _w: w } = this;
+    let cosHalfTheta = w * to._w + x * to._x + y * to._y + z * to._z;
+
+    if (cosHalfTheta < 0) {
+      this._x = -to._x;
+      this._y = -to._y;
+      this._z = -to._z;
+      this._w = -to._w;
+      cosHalfTheta = -cosHalfTheta;
+    } else {
+      this.copy(to);
+    }
+
+    if (cosHalfTheta >= 1.0) {
+      this._x = x;
+      this._y = y;
+      this._z = z;
+      this._w = w;
+      return this;
+    }
+
+    const sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
+    if (sqrSinHalfTheta <= Number.EPSILON) {
+      const s = 1 - t;
+      this._w = s * w + t * this._w;
+      this._x = s * x + t * this._x;
+      this._y = s * y + t * this._y;
+      this._z = s * z + t * this._z;
+      this.normalize();
+      this.onChange();
+      return this;
+    }
+
+    const sinHalfTheta = Sqrt(sqrSinHalfTheta);
+    const halfTheta = Atan2(sinHalfTheta, cosHalfTheta);
+    const ratioA = Sin((1 - t) * halfTheta) / sinHalfTheta;
+    const ratioB = Sin(t * halfTheta) / sinHalfTheta;
+    this._w = (w * ratioA + this._w * ratioB);
+    this._x = (x * ratioA + this._x * ratioB);
+    this._y = (y * ratioA + this._y * ratioB);
+    this._z = (z * ratioA + this._z * ratioB);
+    this.onChange();
+    return this;
+
   }
 
   set(x, y, z, w) {
@@ -119,7 +134,7 @@ export default class Quat {
     return this;
   }
 
-  fromEuler(euler) {
+  fromEulerRotation(euler) {
     const { _x: x, _y: y, _z: z, order } = euler;
     const c1 = Cos(x / 2);
     const c2 = Cos(y / 2);
@@ -163,39 +178,39 @@ export default class Quat {
     return this;
   }
 
-  fromRotationMatrix(m) {
+  fromMatrixRotation(m) {
     const [
       m00, m10, m20,,
       m01, m11, m21,,
       m02, m12, m22,,
     ] = m;
 
-    trace = m00 + m11 + m22;
-
+    const trace = m00 + m11 + m22;
+    let s = 0;
     if (trace > 0) {
-      s = 0.5 / Math.sqrt(trace + 1.0);
-      this._w = 0.25 / s;
+      s = 0.5 / Sqrt(trace + 1.0);
       this._x = (m21 - m12) * s;
       this._y = (m02 - m20) * s;
       this._z = (m10 - m01) * s;
+      this._w = 0.25 / s;
     } else if (m00 > m11 && m00 > m22) {
-      s = 2.0 * Math.sqrt(1.0 + m00 - m11 - m22);
-      this._w = (m21 - m12) / s;
+      s = 2.0 * Sqrt(1.0 + m00 - m11 - m22);
       this._x = 0.25 * s;
       this._y = (m01 + m10) / s;
       this._z = (m02 + m20) / s;
+      this._w = (m21 - m12) / s;
     } else if (m11 > m22) {
-      s = 2.0 * Math.sqrt(1.0 + m11 - m00 - m22);
-      this._w = (m02 - m20) / s;
+      s = 2.0 * Sqrt(1.0 + m11 - m00 - m22);
       this._x = (m01 + m10) / s;
       this._y = 0.25 * s;
       this._z = (m12 + m21) / s;
+      this._w = (m02 - m20) / s;
     } else {
-      s = 2.0 * Math.sqrt(1.0 + m22 - m00 - m11);
-      this._w = (m10 - m01) / s;
+      s = 2.0 * Sqrt(1.0 + m22 - m00 - m11);
       this._x = (m02 + m20) / s;
       this._y = (m12 + m21) / s;
       this._z = 0.25 * s;
+      this._w = (m10 - m01) / s;
     }
     this.onChange();
     return this;
@@ -243,8 +258,24 @@ export default class Quat {
     return this;
   }
 
-  multiply(q) {
-    Quat.Multiply(this, this, q);
+  multiply(q1, q2) {
+    const {
+      _x: ax,
+      _y: ay,
+      _z: az,
+      _w: aw
+    } = q2 ? q1 : this;
+    const {
+      _x: bx,
+      _y: by,
+      _z: bz,
+      _w: bw
+    } = q2 ? q2 : q1;
+
+		this._x = ax * bw + aw * bx + ay * bz - az * by;
+		this._y = ay * bw + aw * by + az * bx - ax * bz;
+		this._z = az * bw + aw * bz + ax * by - ay * bx;
+    this._w = aw * bw - ax * bx - ay * by - az * bz;
     this.onChange();
     return this;
   }
