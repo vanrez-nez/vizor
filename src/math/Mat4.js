@@ -4,7 +4,6 @@ import { copy, multiplyScalar, equals } from "./MatFunc";
 
 const { cos: Cos, sin: Sin, hypot: Hypot } = Math;
 const CACHE = {
-  M4_0: new Mat4(),
   V3_0: new Vec3(),
   V3_1: new Vec3(),
   V3_2: new Vec3(),
@@ -27,51 +26,13 @@ const Zero = Object.freeze([
 ]);
 
 export default class Mat4 extends Array {
-  constructor(arr = Identity) {
+  constructor() {
     super(16);
-    this.copy(arr);
-  }
-
-  static Multiply(out, a, b) {
-    const [
-      a00, a10, a20, a30,
-      a01, a11, a21, a31,
-      a02, a12, a22, a32,
-      a03, a13, a23, a33,
-    ] = a;
-
-    const [
-      b00, b10, b20, b30,
-      b01, b11, b21, b31,
-      b02, b12, b22, b32,
-      b03, b13, b23, b33,
-    ] = b;
-
-		out[0] = a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
-		out[4] = a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
-		out[8] = a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
-		out[12] = a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
-
-		out[1] = a10 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
-		out[5] = a10 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
-		out[9] = a10 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
-		out[13] = a10 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
-
-		out[2] = a20 * b00 + a21 * b10 + a22 * b20 + a23 * b30;
-		out[6] = a20 * b01 + a21 * b11 + a22 * b21 + a23 * b31;
-		out[10] = a20 * b02 + a21 * b12 + a22 * b22 + a23 * b32;
-		out[14] = a20 * b03 + a21 * b13 + a22 * b23 + a23 * b33;
-
-		out[3] = a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30;
-		out[7] = a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31;
-		out[11] = a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32;
-    out[15] = a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33;
-
-    return this;
+    this.copy(Identity);
   }
 
   multiplyScalar(scalar) {
-    multiplyScalar(this, scalar, 16);
+    return multiplyScalar(this, scalar, 16);
   }
 
   copy(m) {
@@ -141,7 +102,7 @@ export default class Mat4 extends Array {
   }
 
   clone() {
-    return new Mat4(this);
+    return new Mat4().copy(this);
   }
 
   copyTranslation(m) {
@@ -153,41 +114,31 @@ export default class Mat4 extends Array {
   }
 
   decompose(position, quaternion, scale) {
-    const { M4_0 } = CACHE;
     const [
-      m00, m10, m20,,
-      m01, m11, m21,,
-      m02, m12, m22,,
-      m03, m13, m23,,
+      m00, m10, m20, m30,
+      m01, m11, m21, m31,
+      m02, m12, m22, m32,
+      m03, m13, m23, m33,
     ] = this;
 
-    const sx = Hypot(m00, m10, m20);
+    const det = this.determinant() < 0 ? -1 : 1;
+    const sx = Hypot(m00, m10, m20) * det;
     const sy = Hypot(m01, m11, m21);
     const sz = Hypot(m02, m12, m22);
-
-    if (this.determinant() < 0) sx = -sx;
-
-    M4_0.copy(this);
 
     const invSX = 1 / sx;
     const invSY = 1 / sy;
     const invSZ = 1 / sz;
 
-    M4_0[0] *= invSX;
-    M4_0[2] *= invSX;
-    M4_0[3] *= invSX;
-
-    M4_0[4] *= invSY;
-    M4_0[5] *= invSY;
-    M4_0[6] *= invSY;
-
-    M4_0[7] *= invSZ;
-    M4_0[8] *= invSZ;
-    M4_0[9] *= invSZ;
-
-    quaternion.setFromRotationMatrix(M4_0);
+    quaternion.fromMatrixRotation([
+      m00 * invSX, m10 * invSX, m20 * invSX, m30,
+      m01 * invSY, m11 * invSY, m21 * invSY, m31,
+      m02 * invSZ, m12 * invSZ, m22 * invSZ, m32,
+      m03, m13, m23, m33
+    ]);
     position.set(m03, m13, m23);
     scale.set(sx, sy, sz);
+    return this;
   }
 
   setTranslation(x, y, z) {
@@ -200,7 +151,7 @@ export default class Mat4 extends Array {
 
   setScale(x, y, z) {
     const m = this;
-    m[1] = x;
+    m[0] = x;
     m[5] = y;
     m[10] = z;
     return this;
@@ -319,34 +270,155 @@ export default class Mat4 extends Array {
     );
   }
 
-  makeOrthographic(left, right, top, bottom, near, far) {
-    const e = this.copy(Identity);
+  fromOrthographic(left, right, top, bottom, near, far) {
+    const m = this.copy(Identity);
     const lr = 1 / (right - left);
     const bt = 1 / (top - bottom);
     const nf = 1 / (far - near);
-    e[0] = -2 * lr;
-    e[5] = -2 * bt;
-    e[10] = -2 * nf;
-    e[12] = -(left + right) * lr;
-    e[13] = -(top + bottom) * br;
-    e[14] = -(far + near) * nf;
+    m[0] = 2 * lr;
+    m[5] = 2 * bt;
+    m[10] = -2 * nf;
+    m[12] = -(left + right) * lr;
+    m[13] = -(top + bottom) * bt;
+    m[14] = -(far + near) * nf;
+    return this;
   }
 
-  makePerspective(left, right, top, bottom, near, far) {
-    const e = this.copy(Identity);
-    e[0] = 2 * near / (right - left);
-    e[5] = 2 * near / (top - bottom);
-    e[8] = (right + left) / (right - left);
-    e[9] = (top + bottom) / (top - bottom);
-    e[10] = -(far + near) / (far - near);
-    e[11] = -1;
-    e[14] = -2 * far * near / (far - near);
+  fromPerspective(left, right, top, bottom, near, far) {
+    const m = this.copy(Zero);
+    m[0] = 2 * near / (right - left);
+    m[5] = 2 * near / (top - bottom);
+    m[8] = (right + left) / (right - left);
+    m[9] = (top + bottom) / (top - bottom);
+    m[10] = -(far + near) / (far - near);
+    m[11] = -1;
+    m[14] = -2 * far * near / (far - near);
+    return this;
+  }
+
+  fromMatrixRotation(m) {
+    // this method does not support reflection matrices
+    var me = this;
+
+    var scaleX = 1 / Hypot(me[0], me[4], me[8]);
+    var scaleY = 1 / Hypot(me[1], me[5], me[9]);
+    var scaleZ = 1 / Hypot(me[2], me[6], me[10]);
+
+    me[0] = m[0] * scaleX;
+    me[1] = m[1] * scaleX;
+    me[2] = m[2] * scaleX;
+    me[3] = 0;
+
+    me[4] = m[4] * scaleY;
+    me[5] = m[5] * scaleY;
+    me[6] = m[6] * scaleY;
+    me[7] = 0;
+
+    me[8] = m[8] * scaleZ;
+    me[9] = m[9] * scaleZ;
+    me[10] = m[10] * scaleZ;
+    me[11] = 0;
+
+    me[12] = 0;
+    me[13] = 0;
+    me[14] = 0;
+    me[15] = 1;
+
     return this;
   }
 
   fromQuatRotation(q) {
     const { V3_ONE, V3_ZERO } = CACHE;
     return this.compose(V3_ZERO, q, V3_ONE);
+  }
+
+  fromEulerRotation(euler) {
+    const { x, y, z, order } = euler;
+    const m = this;
+    const cx = Cos(x);
+    const cy = Cos(y);
+    const cz = Cos(z);
+    const sx = Sin(x);
+    const sy = Sin(y);
+    const sz = Sin(z);
+
+    switch(order) {
+      case'XYZ':
+        m[0] = cy * cz;
+        m[4] = -cy * sz;
+        m[8] = sy;
+        m[1] = cx * sz + sx * cz * sy;
+        m[5] = cx * cz - sx * sz * sy;
+        m[9] = -sx * cy;
+        m[2] = sx * sz - cx * cz * sy;
+        m[6] = sx * cz + cx * sz * sy;
+        m[10] = cx * cy;
+      break;
+      case 'YXZ':
+        m[0] = cy * cz + sy * sz * sx;
+        m[4] = sy * cz * sx - cy * sz;
+        m[8] = cx * sy;
+        m[1] = cx * sz;
+        m[5] = cx * cz;
+        m[9] = -sx;
+        m[2] = cy * sz * sx - sy * cz;
+        m[6] = sy * sz + cy * cz * sx;
+        m[10] = cx * cy;
+        break;
+      case 'ZXY':
+        m[0] = cy * cz - sy * sz * sx;
+        m[4] = -cx * sz;
+        m[8] = sy * cz + cy * sz * sx;
+        m[1] = cy * sz + sy * cz * sx;
+        m[5] = cx * cz;
+        m[9] = sy * sz - cy * cz * sx;
+        m[2] = - cx * sy;
+        m[6] = sx;
+        m[10] = cx * cy;
+        break;
+      case 'ZYX':
+        m[0] = cy * cz;
+        m[4] = sx * cz * sy - cx * sz;
+        m[8] = cx * cz * sy + sx * sz;
+        m[1] = cy * sz;
+        m[5] = sx * sz * sy + cx * cz;
+        m[9] = cx * sz * sy - sx * cz;
+        m[2] = -sy;
+        m[6] = sx * cy;
+        m[10] = cx * cy;
+        break;
+      case 'YZX':
+        m[0] = cy * cz;
+        m[4] = sx * sy - cx * cy * sz;
+        m[8] = sx * cy * sz + cx * sy;
+        m[1] = sz;
+        m[5] = cx * cz;
+        m[9] = -sx * cz;
+        m[2] = -sy * cz;
+        m[6] = cx * sy * sz + sx * cy;
+        m[10] = cx * cy - sx * sy * sz;
+        break;
+      case 'XZY':
+        m[0] = cy * cz;
+        m[4] = -sz;
+        m[8] = sy * cz;
+        m[1] = cx * cy * sz + sx * sy;
+        m[5] = cx * cz;
+        m[9] = cx * sy * sz - sx * cy;
+        m[2] = sx * cy * sz - cx * sy;
+        m[6] = sx * cz;
+        m[10] = sx * sy * sz + cx * cy;
+        break;
+    }
+
+    m[3] = 0;
+		m[7] = 0;
+		m[11] = 0;
+		m[12] = 0;
+		m[13] = 0;
+		m[14] = 0;
+		m[15] = 1;
+    return this;
   }
 
   fromScale(x, y, z) {
@@ -361,15 +433,15 @@ export default class Mat4 extends Array {
     return this;
   }
 
-  fromRotation(axis, rad) {
+  fromAxisRotation(axis, rad) {
     const { x, y, z } = axis;
     const c = Cos(rad);
     const s = Sin(rad);
-    const t = 1 - cos;
+    const t = 1 - c;
     const tx = t * x;
     const ty = t * y;
 
-    this.set(
+    return this.set(
       tx * x + c, tx * y - s * z, tx * z + s * y, 0,
       tx * y + s * z, ty * y + c, ty * z - s * x, 0,
       tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
@@ -377,8 +449,43 @@ export default class Mat4 extends Array {
     );
   }
 
-  multiply(m) {
-    return Mat4.Multiply(this, this, m);
+  multiply(m1, m2) {
+    const m = this;
+    const [
+      a00, a10, a20, a30,
+      a01, a11, a21, a31,
+      a02, a12, a22, a32,
+      a03, a13, a23, a33,
+    ] = m2 ? m1 : this;
+
+    const [
+      b00, b10, b20, b30,
+      b01, b11, b21, b31,
+      b02, b12, b22, b32,
+      b03, b13, b23, b33,
+    ] = m2 ? m2 : m1;
+
+		m[0] = a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
+		m[4] = a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
+		m[8] = a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
+		m[12] = a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
+
+		m[1] = a10 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
+		m[5] = a10 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
+		m[9] = a10 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
+		m[13] = a10 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
+
+		m[2] = a20 * b00 + a21 * b10 + a22 * b20 + a23 * b30;
+		m[6] = a20 * b01 + a21 * b11 + a22 * b21 + a23 * b31;
+		m[10] = a20 * b02 + a21 * b12 + a22 * b22 + a23 * b32;
+		m[14] = a20 * b03 + a21 * b13 + a22 * b23 + a23 * b33;
+
+		m[3] = a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30;
+		m[7] = a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31;
+		m[11] = a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32;
+    m[15] = a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33;
+
+    return this;
   }
 
   lookAt(eye, target, up) {
@@ -389,8 +496,11 @@ export default class Mat4 extends Array {
     vz.normalize();
     vx.cross(up, vz);
     if (vx.lengthSqrt() === 0) {
-      vz.x += Number.EPSILON;
-      vx.z += Number.EPSILON;
+      if ( Math.abs( up.z ) === 1 ) {
+        vz.x += Number.EPSILON;
+      } else {
+        vz.z += Number.EPSILON;
+      }
       vz.normalize();
       vx.cross(up, vz);
     }
@@ -404,9 +514,6 @@ export default class Mat4 extends Array {
 
   // extractBasis
   // makeBasis
-  // extractRotation
-  // fromMatrixRotation
-  // fromEulerRotation
 
   equals(m) {
     return equals(this, m, 16);
