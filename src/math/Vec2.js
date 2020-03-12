@@ -11,15 +11,15 @@ export default class Vec2 {
   }
 
   addScalar(scalar) {
-    return VecFun.addScalar(out, scalar, 2);
+    return VecFun.addScalar(this, scalar, 2);
   }
 
   addScaledVector(v, scale) {
-    return VecFun.scaleAndAdd(out, v, scale, 2);
+    return VecFun.scaleAndAdd(this, v, scale, 2);
   }
 
   ceil() {
-    return VecFun.ceil(out, 2);
+    return VecFun.ceil(this, 2);
   }
 
   clamp(min, max) {
@@ -122,6 +122,10 @@ export default class Vec2 {
     return VecFun.setLength(this, length, 2);
   }
 
+  setScalar(scalar) {
+    return VecFun.set(this, scalar, scalar, 0, 0, 2);
+  }
+
   sub(v1, v2) {
     if (v2) return VecFun.sub(this, v1, v2, 2);
     return VecFun.sub(this, this, v1, 2);
@@ -135,11 +139,10 @@ export default class Vec2 {
     return Math.atan2(-this.y, -this.x) + Math.PI;
   }
 
-  applyMatrix3(mat3) {
+  applyMatrix3(m) {
     const { x, y } = this;
-    const { elements: e } = mat3;
-		this.x = e[0] * x + e[3] * y + e[6];
-		this.y = e[1] * x + e[4] * y + e[7];
+		this.x = m[0] * x + m[3] * y + m[6];
+		this.y = m[1] * x + m[4] * y + m[7];
     return this;
   }
 

@@ -2,9 +2,9 @@ import * as VecFun from './VecFun';
 
 export default class Vec3 {
   constructor(x, y, z) {
-    this.x = x || x;
-    this.y = y || y;
-    this.z = z || z;
+    this.x = x || 0;
+    this.y = y || 0;
+    this.z = z || 0;
   }
 
   add(v1, v2) {
@@ -12,15 +12,15 @@ export default class Vec3 {
   }
 
   addScalar(scalar) {
-    return VecFun.addScalar(out, scalar, 3);
+    return VecFun.addScalar(this, scalar, 3);
   }
 
   addScaledVector(v, scale) {
-    return VecFun.scaleAndAdd(out, v, scale, 3);
+    return VecFun.scaleAndAdd(this, v, scale, 3);
   }
 
   ceil() {
-    return VecFun.ceil(out, 3);
+    return VecFun.ceil(this, 3);
   }
 
   clamp(min, max) {
@@ -133,6 +133,10 @@ export default class Vec3 {
     return VecFun.subScalar(this, scalar, 3);
   }
 
+  setScalar(scalar) {
+    return VecFun.set(this, scalar, scalar, scalar, 0, 3);
+  }
+
   // angleTo() {}
   // applyEuler(euler) {}
   // applyAxisAngle(axis, angle) {}
@@ -155,9 +159,9 @@ export default class Vec3 {
   // setFromMatrix3Column(mat, index) {}
 
 
-  applyMatrix4(mat4) {
+  applyMatrix4(m) {
     const { x, y, z } = this;
-    const { elements: e } = mat4;
+    const { elements: e } = m;
     const w = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
     this.x = (e[0] * x + e[4] * y + e[8] * z + e[12]) * w;
     this.y = (e[1] * x + e[5] * y + e[9] * z + e[13]) * w;
@@ -165,9 +169,9 @@ export default class Vec3 {
     return this;
   }
 
-  applyMatrix3(mat3) {
+  applyMatrix3(m) {
     const { x, y, z } = this;
-    const { elements: e } = mat3;
+    const { elements: e } = m;
     this.x = e[0] * x + e[3] * y + e[6] * z;
     this.y = e[1] * x + e[4] * y + e[7] * z;
     this.z = e[2] * x + e[5] * y + e[8] * z;
