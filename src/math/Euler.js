@@ -8,8 +8,8 @@ const CACHE = {
 };
 
 export default class Euler {
-  constructor(x, y, z, order = "XYZ") {
-    this._x = x || 0;
+  constructor(x = 0, y, z, order = "XYZ") {
+    this._x = x;
     this._y = y || x;
     this._z = z || x;
     this.order = order;
@@ -63,12 +63,12 @@ export default class Euler {
     this.onChange = callback;
   }
 
-  fromRotationMatrix(mat4, order = this.order) {
+  fromMatrixRotation(m, order = this.order) {
     const [
-      m00, m10, m20,
-      m01, m11, m21,
-      m02, m12, m22
-    ] = mat4;
+      m00, m10, m20,,
+      m01, m11, m21,,
+      m02, m12, m22,,
+    ] = m;
     const b = 0.9999999;
     switch(order) {
       case "XYZ":
