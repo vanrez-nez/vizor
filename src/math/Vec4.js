@@ -1,3 +1,5 @@
+import * as VecFun from './VecFun';
+
 export default class Vec4 {
   constructor(x, y, z, w) {
     this.x = x || 0;
@@ -7,19 +9,19 @@ export default class Vec4 {
   }
 
   add(v1, v2) {
-    return VecFun.add(this, v1 || this, v2, 4);
+    return VecFun.add(this, v2 || this, v1, 4);
   }
 
   addScalar(scalar) {
-    return VecFun.addScalar(out, scalar, 4);
+    return VecFun.addScalar(this, scalar, 4);
   }
 
   addScaledVector(v, scale) {
-    return VecFun.scaleAndAdd(out, v, scale, 4);
+    return VecFun.scaleAndAdd(this, v, scale, 4);
   }
 
   ceil() {
-    return VecFun.ceil(out, 4);
+    return VecFun.ceil(this, 4);
   }
 
   clamp(min, max) {
@@ -96,7 +98,7 @@ export default class Vec4 {
   }
 
   multiply(v1, v2) {
-    return VecFun.mul(this, v1 || this, v2, 4);
+    return VecFun.mul(this, v2 || this, v1, 4);
   }
 
   multiplyScalar(scalar) {
@@ -123,6 +125,10 @@ export default class Vec4 {
     return VecFun.setLength(this, length, 4);
   }
 
+  setScalar(scalar) {
+    return VecFun.set(this, scalar, scalar, scalar, scalar, 4);
+  }
+
   sub(v1, v2) {
     if (v2) return VecFun.div(this, v1, v2, 4);
     return VecFun.sub(this, this, v1, 4);
@@ -137,11 +143,10 @@ export default class Vec4 {
 
   applyMatrix4(m) {
     const { x, y, z, w } = this;
-    const { elements: e } = m;
-		this.x = e[0] * x + e[4] * y + e[8] * z + e[12] * w;
-		this.y = e[1] * x + e[5] * y + e[9] * z + e[13] * w;
-		this.z = e[2] * x + e[6] * y + e[10] * z + e[14] * w;
-		this.w = e[3] * x + e[7] * y + e[11] * z + e[15] * w;
+		this.x = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+		this.y = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+		this.z = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+		this.w = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
 		return this;
   }
 
