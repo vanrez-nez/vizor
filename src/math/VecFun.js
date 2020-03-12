@@ -97,6 +97,10 @@ export function div(out, a, b, len) {
   return out;
 }
 
+export function divScalar(out, scalar, len) {
+  return mulScalar(out, 1 / scalar, len);
+}
+
 export function dot(out, vec, len) {
   let result = out.x * vec.x + out.y * vec.y;
   if (len > 2) { result += out.z * vec.z;
@@ -246,10 +250,10 @@ export function sub(out, a, b, len) {
 }
 
 export function subScalar(out, scalar, len) {
-  out.x += scalar;
-  out.y += scalar;
-  if (len > 2) { out.z += scalar;
-    if (len > 3) out.w += scalar;
+  out.x -= scalar;
+  out.y -= scalar;
+  if (len > 2) { out.z -= scalar;
+    if (len > 3) out.w -= scalar;
   }
   return out;
 }
