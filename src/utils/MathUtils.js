@@ -1,4 +1,15 @@
+const DEG_TO_RAD = Math.PI / 180;
+const RAD_TO_DEG = 180 / Math.PI;
+
 // https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
+
+export function toDegrees(radians) {
+  return radians * RAD_TO_DEG;
+}
+
+export function toRadians(degrees) {
+  return degrees * DEG_TO_RAD;
+}
 
 export function clamp(val, min, max) {
   return Math.min(Math.max(val, min), max);
