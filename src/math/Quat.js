@@ -1,7 +1,9 @@
 import * as VecFunc from "./VecFun";
 import { clamp } from '../utils/MathUtils';
+import EventEmitter from "../core/EventEmitter";
 const { atan2: Atan2, abs: Abs, acos: Acos, cos: Cos, sin: Sin, sqrt: Sqrt } = Math;
-const Noop = () => {};
+
+const CHANGE_EVENT = 'change';
 
 export default class Quat {
   constructor(x, y, z, w) {
@@ -9,7 +11,7 @@ export default class Quat {
     this._y = y || 0;
     this._z = z || 0;
     this._w = w !== undefined ? w : 1;
-    this.onChange = Noop;
+    this.events = new EventEmitter();
   }
 
   get x() {
@@ -30,22 +32,22 @@ export default class Quat {
 
   set x(val) {
     this._x = val;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
   }
 
   set y(val) {
     this._y = val;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
   }
 
   set z(val) {
     this._z = val;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
   }
 
   set w(val) {
     this._w = val;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
   }
 
   angleTo(q) {
@@ -89,7 +91,7 @@ export default class Quat {
       this._y = s * y + t * this._y;
       this._z = s * z + t * this._z;
       this.normalize();
-      this.onChange();
+      this.events.emit(CHANGE_EVENT);
       return this;
     }
 
@@ -101,7 +103,7 @@ export default class Quat {
     this._x = (x * ratioA + this._x * ratioB);
     this._y = (y * ratioA + this._y * ratioB);
     this._z = (z * ratioA + this._z * ratioB);
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
 
   }
@@ -111,7 +113,7 @@ export default class Quat {
     this._y = y;
     this._z = z;
     this._w = w;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
@@ -130,7 +132,7 @@ export default class Quat {
     this._y = axis.y * s;
     this._z = axis.z * s;
     this._w = Math.cos(h);
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
@@ -174,7 +176,7 @@ export default class Quat {
         this._w = c1 * c2 * c3 + s1 * s2 * s3;
         break;
     }
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
@@ -212,7 +214,7 @@ export default class Quat {
       this._z = 0.25 * s;
       this._w = (m10 - m01) / s;
     }
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
@@ -224,7 +226,7 @@ export default class Quat {
     this._x *= -1;
     this._y *= -1;
     this._z *= -1;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
@@ -276,7 +278,7 @@ export default class Quat {
 		this._y = ay * bw + aw * by + az * bx - ax * bz;
 		this._z = az * bw + aw * bz + ax * by - ay * bx;
     this._w = aw * bw - ax * bx - ay * by - az * bz;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
@@ -287,9 +289,5 @@ export default class Quat {
       q._z === this._z &&
       q._w === this._w
     );
-  }
-
-  onChange(callback) {
-    this.onChange = callback;
   }
 }

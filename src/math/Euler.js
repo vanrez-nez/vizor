@@ -1,8 +1,9 @@
+import EventEmitter from "../core/EventEmitter";
 import { clamp } from "../utils/MathUtils";
 import Mat4 from "./Mat4";
-
 const { asin: Asin, atan2: Atan2, abs: Abs } = Math;
-const Noop = () => {};
+
+const CHANGE_EVENT = 'change';
 const CACHE = {
   M4_0: new Mat4(),
 };
@@ -13,7 +14,7 @@ export default class Euler {
     this._y = y || x;
     this._z = z || x;
     this.order = order;
-    this.onChange = Noop;
+    this.events = new EventEmitter();
   }
 
   get x() {
@@ -28,24 +29,24 @@ export default class Euler {
 
   set x(val) {
     this._x = val;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
   }
 
   set y(val) {
     this._y = val;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
   }
 
   set z(val) {
     this._z = val;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
   }
 
   set(x, y, z) {
     this._x = x;
     this._y = y;
     this._z = z;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
@@ -57,10 +58,6 @@ export default class Euler {
 
   clone() {
     return new Euler(this.x, this.y, this.z, this.order);
-  }
-
-  onChange(callback) {
-    this.onChange = callback;
   }
 
   fromMatrixRotation(m, order = this.order) {
@@ -133,13 +130,13 @@ export default class Euler {
         break;
     }
     this.order = order;
-    this.onChange();
+    this.events.emit(CHANGE_EVENT);
     return this;
   }
 
-  fromQuaternion(quat, order = this.order) {
+  fromQuatRotation(quat, order = this.order) {
     const { M4_0 } = CACHE;
     M4_0.fromQuatRotation(quat);
-    return this.fromRotationMatrix(M4_0, order);
+    return this.fromMatrixRotation(M4_0, order);
   }
 }
