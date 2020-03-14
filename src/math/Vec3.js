@@ -192,4 +192,8 @@ export default class Vec3 {
   clone() {
     return new Vec3(this.x, this.y, this.z);
   }
+
+  toArray(arr, offset) {
+    return VecFun.toArray(this, arr, offset, 3);
+  }
 }

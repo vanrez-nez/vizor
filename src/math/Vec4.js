@@ -154,4 +154,8 @@ export default class Vec4 {
     return new Vec4(this.x, this.y, this.z, this.w);
   }
 
+  toArray(arr, offset) {
+    return VecFun.toArray(this, arr, offset, 4);
+  }
+
 }

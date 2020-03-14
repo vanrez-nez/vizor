@@ -257,3 +257,12 @@ export function subScalar(out, scalar, len) {
   }
   return out;
 }
+
+export function toArray(vec, out = [], offset = 0, len) {
+  out[offset + 0] = vec.x;
+  out[offset + 1] = vec.y;
+  if (len > 2) { out[offset + 2] = vec.z;
+    if (len > 3) out[offset + 3] = vec.w;
+  }
+  return out;
+}

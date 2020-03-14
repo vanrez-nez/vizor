@@ -163,4 +163,8 @@ export default class Vec2 {
     this.y = x * s + y * c + center.y;
     return this;
   }
+
+  toArray(arr, offset) {
+    return VecFun.toArray(this, arr, offset, 2);
+  }
 }
