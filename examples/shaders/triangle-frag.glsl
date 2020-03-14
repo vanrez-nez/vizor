@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform vec3 u_vec3a[3];
+uniform float u_fa[10];
 varying vec2 vUv;
 
 void main() {
