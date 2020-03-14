@@ -1,5 +1,4 @@
 import RawUniform from './RawUniform';
-import RawUniformArray from './RawUniformArray';
 import Uniform from './Uniform';
 import Attribute from './Attribute';
 import GLState from './GLState';
@@ -73,14 +72,8 @@ export default class Shader {
         }
       }
 
-      if (isPropArray) {
-        root[property.name] = new RawUniformArray(gl, info);
-        root = root[property.name];
-      } else {
-        const obj = new RawUniform(gl, info);
-        root[property.name] = obj;
-      }
-
+      const obj = new RawUniform(gl, info);
+      root[property.name] = obj;
     });
     return result;
   }
