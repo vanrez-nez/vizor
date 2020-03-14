@@ -1,4 +1,16 @@
 export default class EventEmitter {
+  constructor() {
+    this.paused = true;
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  resume() {
+    this.paused = false;
+  }
+
   on(type, handler) {
     this.types = this.types || new Map();
     if (!this.types.has(type)) {
@@ -13,6 +25,7 @@ export default class EventEmitter {
   }
 
   emit(type, event) {
+    if (this.paused) return false;
     const handlers = this.types.get(type);
     for (let handler of handlers) {
       handler(event);
